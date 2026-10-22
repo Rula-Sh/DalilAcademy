@@ -1,3 +1,8 @@
+using DalilAcademy.Core.Repository;
+using DalilAcademy.Core.Service;
+using DalilAcademy.Infrastructure.Repository;
+using DalilAcademy.Infrastructure.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,6 +21,9 @@ builder.Services.AddSwaggerGen(options => // creates the file that describes the
         Description = "Learning Management System API built with ASP.NET Core 10"
     });
 });
+
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 // the above code is used to register the services that we need
 var app = builder.Build(); // this line splits the project into two

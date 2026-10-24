@@ -1,41 +1,36 @@
 ﻿using DalilAcademy.Core.Entites;
 using DalilAcademy.Core.Repository;
-using System.Runtime.InteropServices;
+using DalilAcademy.Infra.Data;
 
-namespace DalilAcademy.Infrastructure.Repository
+namespace DalilAcademy.Infra.Repository
 {
-    public class CourseRepository : ICourseRepository
+    public class CourseRepository(AppDbContext db) : ICourseRepository
     {
-        private static readonly List<Course> _courses = []; // static keeps the list alive
         public List<Course> GetAll()
         {
-            return _courses;
+            return db.Courses.ToList();
         }
         public Course GetById(int id)
         {
-            var course = _courses.FirstOrDefault(c => c.Id == id);
-            return course;
+            return db.Courses.Find(id);
         }
         public Course Create(Course course)
         {
-            course.Id = _courses.Count == 0 ? 1 : _courses.Max(c => c.Id) + 1;
-            _courses.Add(course);
+            db.Courses.Add(course);
+            db.SaveChanges();
             return course;
         }
         public Course Update(Course course)
         {
-            var courseIndex = _courses.FindIndex(c => c.Id == course.Id);
-            if (courseIndex == -1)
-                return null;
-
-            _courses[courseIndex] = course;
+            db.Courses.Update(course);
+            db.SaveChanges();
             return course;
         }
         public Course Delete(int id)
         {
-            var course = _courses.FirstOrDefault(c => c.Id == id);
-            if (course is null) return null;
-            _courses.Remove(course);
+            var course = db.Courses.Find(id);
+            db.Courses.Remove(course);
+            db.SaveChanges();
             return course;
         }
     }

@@ -2,7 +2,7 @@
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
 
-namespace DalilAcademy.Infrastructure.Service
+namespace DalilAcademy.Infra.Service
 {
     public class CourseService(ICourseRepository courseRepository) : ICourseService
     {

@@ -1,7 +1,9 @@
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
-using DalilAcademy.Infrastructure.Repository;
-using DalilAcademy.Infrastructure.Service;
+using DalilAcademy.Infra.Data;
+using DalilAcademy.Infra.Repository;
+using DalilAcademy.Infra.Service;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,8 @@ builder.Services.AddSwaggerGen(options => // creates the file that describes the
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // the above code is used to register the services that we need
 var app = builder.Build(); // this line splits the project into two

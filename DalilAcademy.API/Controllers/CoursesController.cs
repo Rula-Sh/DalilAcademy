@@ -8,57 +8,62 @@ namespace DalilAcademy.API.Controllers
     [ApiController] // marks the class as an API controller (adds helpful API defaults, like returning 400 errors automatically when input is invalid)
     public class CoursesController(ICourseService courseService) : ControllerBase // Primary Contstructor 
     {
-        // CRUD Operations
 
-        // GetAll
         [HttpGet]
         // not having a Route attribute means that it will pull the controller Route attribute
         //[Route("get-all-courses")] // https:localhost/port#/api/courses/get-all-courses (if u wanted a custom url)
-        public ActionResult<List<Course>> GetAll()
+        public async Task<ActionResult<List<Course>>> GetAll()
         {
-            return Ok(courseService.GetAll());
+            return Ok(await courseService.GetAllAsync());
         }
 
-        // GetById
         [HttpGet]
         [Route("{id:int}")]
-        public ActionResult<Course> GetById(int id)
+        public async Task<ActionResult<Course>> GetById(int id)
         {
-            return Ok(courseService.GetById(id));
+            var course = await courseService.GetByIdAsync(id);
+            if (course is null)
+                return NotFound();
+
+            return Ok(course);
         }
 
-        // Create
         [HttpPost]
-        public ActionResult<Course> Create(Course course)
+        public async Task<ActionResult<Course>> Create(Course course)
         {
-            return courseService.Create(course);
+            try
+            {
+                var created = await courseService.CreateAsync(course);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // Update
         [HttpPut]
         [Route("{id:int}")]
-        public ActionResult<Course> Update(int id, Course course)
+        public async Task<ActionResult> Update(int id, Course course)
         {
-            if (id != course.Id)
-                return BadRequest();
+            try
+            {
+                if (id != course.Id)
+                    return BadRequest();
 
-            var updated = courseService.Update(course);
-            if (updated is null)
-                return NotFound();
-
-            return Ok(updated);
+                return await courseService.UpdateAsync(id, course) ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // Delete
         [HttpDelete]
         [Route("{id:int}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var deleted = courseService.Delete(id);
-            if (deleted is null)
-                return NotFound();
-
-            return NoContent();
+            return await courseService.DeleteAsync(id) ? NoContent() : NotFound();
         }
 
         // run the project, then test the API URLs on Postman to check if the code works

@@ -4,10 +4,10 @@ namespace DalilAcademy.Core.Service
 {
     public interface ICourseService
     {
-        List<Course> GetAll();
-        Course GetById(int id);
-        Course Create(Course course);
-        Course Update(Course course);
-        Course Delete(int id);
+        Task<List<Course>> GetAllAsync();
+        Task<Course?> GetByIdAsync(int id);
+        Task<Course> CreateAsync(Course course);
+        Task<bool> UpdateAsync(int id, Course course);
+        Task<bool> DeleteAsync(int id);
     }
 }

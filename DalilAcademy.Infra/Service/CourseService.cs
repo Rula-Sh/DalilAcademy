@@ -6,24 +6,36 @@ namespace DalilAcademy.Infra.Service
 {
     public class CourseService(ICourseRepository courseRepository) : ICourseService
     {
-        public List<Course> GetAll() {
-            return courseRepository.GetAll();
-        }
-        public Course GetById(int id)
+        public Task<List<Course>> GetAllAsync()
         {
-            return courseRepository.GetById(id);
+            return courseRepository.GetAllAsync();
         }
-        public Course Create(Course course)
+        public Task<Course?> GetByIdAsync(int id)
         {
-            return courseRepository.Create(course);
+            return courseRepository.GetByIdAsync(id);
         }
-        public Course Update(Course course)
+        public Task<Course> CreateAsync(Course course)
         {
-            return courseRepository.Update(course);
+            if (course.Price < 0)
+                throw new ArgumentException("Price cannot be negative");
+
+            return courseRepository.CreateAsync(course);
         }
-        public Course Delete(int id)
+        public async Task<bool> UpdateAsync(int id, Course input)
         {
-            return courseRepository.Delete(id);
+            var course = await courseRepository.GetByIdAsync(id);
+            if (course is null)
+                return false;
+
+            course.Title = input.Title;
+            course.Price = input.Price;
+
+            await courseRepository.UpdateAsync(course);
+            return true;
+        }
+        public async Task<bool> DeleteAsync(int id)
+        {
+            return await courseRepository.DeleteAsync(id);
         }
     }
 }

@@ -1,44 +1,44 @@
-﻿using DalilAcademy.Core.Entites;
-using DalilAcademy.Core.Entities;
+﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Mappings;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
+using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class StudentService(IStudentRepository studentRepository) : IStudentService
+    public class StudentService(IStudentRepository studentRepository, IValidator<CreateStudentDto> validator) : IStudentService
     {
-        public Task<List<Student>> GetAllAsync()
+        public async Task<List<StudentResponseDto>> GetAllAsync()
         {
-            return studentRepository.GetAllAsync();
+            var students = await studentRepository.GetAllAsync();
+            return students.Select(s => s.ToDto()).ToList();
         }
-        public Task<Student?> GetByIdAsync(int id)
+        public async Task<StudentResponseDto?> GetByIdAsync(int id)
         {
-            return studentRepository.GetByIdAsync(id);
+            var student = await studentRepository.GetByIdAsync(id) ?? throw new DirectoryNotFoundException($"Student with ID {id} was not found");
+            return student?.ToDto();
         }
-        public Task<Student> CreateAsync(Student student)
+        public async Task<StudentResponseDto> CreateAsync(CreateStudentDto dto)
         {
+            await validator.ValidateAndThrowAsync(dto);
 
-            if (student.Level <= 0)
-                throw new ArgumentException("Student level cannot be 0 or below");
-
-            return studentRepository.CreateAsync(student);
+            var student = dto.ToEntity();
+            var created = await studentRepository.CreateAsync(student);
+            return created.ToDto();
         }
-        public async Task<bool> UpdateAsync(int id, Student input)
+        public async Task UpdateAsync(int id, UpdateStudentDto input)
         {
-            var student = await studentRepository.GetByIdAsync(id);
-            if (student is null)
-                return false;
+            var student = await studentRepository.GetByIdAsync(id) ?? throw new DirectoryNotFoundException($"Student with ID {id} was not found"); ;
 
             student.FullName = input.FullName;
             student.Email = input.Email;
-            student.Level = input.Level;
 
             await studentRepository.UpdateAsync(student);
-            return true;
         }
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            return await studentRepository.DeleteAsync(id);
+            if (!await studentRepository.DeleteAsync(id))
+                throw new DirectoryNotFoundException($"Student with ID {id} was not found");
         }
     }
 }

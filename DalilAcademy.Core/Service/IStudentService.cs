@@ -1,13 +1,14 @@
-﻿using DalilAcademy.Core.Entities;
+﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Entities;
 
 namespace DalilAcademy.Core.Service
 {
     public interface IStudentService
     {
-        Task<List<Student>> GetAllAsync();
-        Task<Student?> GetByIdAsync(int id);
-        Task<Student> CreateAsync(Student student);
-        Task<bool> UpdateAsync(int id, Student student);
-        Task<bool> DeleteAsync(int id);
+        Task<List<StudentResponseDto>> GetAllAsync();
+        Task<StudentResponseDto?> GetByIdAsync(int id);
+        Task<StudentResponseDto> CreateAsync(CreateStudentDto student);
+        Task UpdateAsync(int id, UpdateStudentDto student);
+        Task DeleteAsync(int id);
     }
 }

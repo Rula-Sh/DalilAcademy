@@ -36,6 +36,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCourseDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateStudentDtoValidator>();
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 

@@ -1,4 +1,5 @@
-﻿using DalilAcademy.Core.Entities;
+﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Entities;
 using DalilAcademy.Core.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,7 @@ namespace DalilAcademy.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class StudentsController(IStudentService studentService) : Controller
+    public class StudentsController(IStudentService studentService) : ControllerBase
     {
         [HttpGet]
         public async Task<ActionResult<List<Student>>> GetAll()
@@ -26,41 +27,26 @@ namespace DalilAcademy.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Student>> Create(Student student)
+        public async Task<ActionResult<Student>> Create(CreateStudentDto dto)
         {
-            try
-            {
-                var created = await studentService.CreateAsync(student);
-                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var created = await studentService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<ActionResult> Update(int id, Student student)
+        public async Task<ActionResult> Update(int id, UpdateStudentDto student)
         {
-            try
-            {
-                if (id != student.Id)
-                    return BadRequest();
-
-                return await studentService.UpdateAsync(id, student) ? NoContent() : NotFound();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await studentService.UpdateAsync(id, student);
+            return NoContent();
         }
 
         [HttpDelete]
         [Route("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            return await studentService.DeleteAsync(id) ? NoContent() : NotFound();
+            await studentService.DeleteAsync(id);
+            return NoContent(); ;
         }
     }
 }

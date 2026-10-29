@@ -1,8 +1,11 @@
+using DalilAcademy.API.Middleware;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
+using DalilAcademy.Core.Validators;
 using DalilAcademy.Infra.Data;
 using DalilAcademy.Infra.Repository;
 using DalilAcademy.Infra.Service;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +35,10 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCourseDtoValidator>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // the above code is used to register the services that we need
 var app = builder.Build(); // this line splits the project into two
 // the below code manages the requests order.
@@ -53,6 +60,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection(); // converts every http request to https
 

@@ -1,41 +1,50 @@
-﻿using DalilAcademy.Core.Entites;
+﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Entites;
+using DalilAcademy.Core.Exceptions;
+using DalilAcademy.Core.Mappings;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
+using DalilAcademy.Core.Validators;
+using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class CourseService(ICourseRepository courseRepository) : ICourseService
+    public class CourseService(ICourseRepository courseRepository, IValidator<CreateCourseDto> validator) : ICourseService
     {
-        public Task<List<Course>> GetAllAsync()
+        public async Task<List<CourseResponseDto>> GetAllAsync()
         {
-            return courseRepository.GetAllAsync();
+            var courses = await courseRepository.GetAllAsync();
+            //return courses.Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor?.FullName)).ToList(); // this code will repeat in multiple times, and incase of an update on the CourseResponseDto, i will need to update it everywhere, that's why we will use Extension-Method Mapping
+            //return courses.Select(c => CourseMappings.ToDto(c)).ToList(); // before making the ToDto an extention method completely (added the static, but not the this in the parameter)
+            return courses.Select(c => c.ToDto()).ToList();
         }
-        public Task<Course?> GetByIdAsync(int id)
+        public async Task<CourseResponseDto?> GetByIdAsync(int id)
         {
-            return courseRepository.GetByIdAsync(id);
+            var course = await courseRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Course with ID {id} was not found");
+            return course?.ToDto();
         }
-        public Task<Course> CreateAsync(Course course)
+        public async Task<CourseResponseDto> CreateAsync(CreateCourseDto dto)
         {
-            if (course.Price < 0)
-                throw new ArgumentException("Price cannot be negative");
+            await validator.ValidateAndThrowAsync(dto); // validates the dto data, else throws a validation exception
 
-            return courseRepository.CreateAsync(course);
+            var course = dto.ToEntity();
+            var created = await courseRepository.CreateAsync(course);
+
+            return created.ToDto();
         }
-        public async Task<bool> UpdateAsync(int id, Course input)
+        public async Task UpdateAsync(int id, Course input)
         {
-            var course = await courseRepository.GetByIdAsync(id);
-            if (course is null)
-                return false;
+            var course = await courseRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Course with ID {id} was not found");
 
             course.Title = input.Title;
             course.Price = input.Price;
 
             await courseRepository.UpdateAsync(course);
-            return true;
         }
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            return await courseRepository.DeleteAsync(id);
+            if (!await courseRepository.DeleteAsync(id))
+                throw new NotFoundException($"Course with ID {id} was not found");
         }
     }
 }

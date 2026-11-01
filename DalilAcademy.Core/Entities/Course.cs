@@ -1,6 +1,4 @@
-﻿using DalilAcademy.Core.Entities;
-
-namespace DalilAcademy.Core.Entites
+﻿namespace DalilAcademy.Core.Entities
 {
     public class Course
     {

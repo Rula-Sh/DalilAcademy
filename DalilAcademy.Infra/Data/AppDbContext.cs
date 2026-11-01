@@ -1,5 +1,4 @@
-﻿using DalilAcademy.Core.Entites;
-using DalilAcademy.Core.Entities;
+﻿using DalilAcademy.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DalilAcademy.Infra.Data

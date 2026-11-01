@@ -1,4 +1,4 @@
-﻿using DalilAcademy.Core.Entites;
+﻿using DalilAcademy.Core.Entities;
 
 namespace DalilAcademy.Core.Repository
 {

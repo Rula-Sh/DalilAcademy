@@ -1,4 +1,4 @@
-﻿using DalilAcademy.Core.Entites;
+﻿using DalilAcademy.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

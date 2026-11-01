@@ -1,5 +1,4 @@
 ﻿using DalilAcademy.Core.DTOs;
-using DalilAcademy.Core.Entites;
 
 namespace DalilAcademy.Core.Service
 {

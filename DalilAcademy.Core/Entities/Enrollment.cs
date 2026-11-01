@@ -1,5 +1,3 @@
-﻿using DalilAcademy.Core.Entites;
-
 namespace DalilAcademy.Core.Entities
 {
     public class Enrollment

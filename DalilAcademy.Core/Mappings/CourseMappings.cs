@@ -1,5 +1,5 @@
 ﻿using DalilAcademy.Core.DTOs;
-using DalilAcademy.Core.Entites;
+using DalilAcademy.Core.Entities;
 namespace DalilAcademy.Core.Mappings
 {
     public static class CourseMappings

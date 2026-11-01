@@ -25,7 +25,7 @@ namespace DalilAcademy.Infra.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DalilAcademy.Core.Entites.Course", b =>
+            modelBuilder.Entity("DalilAcademy.Core.Entities.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -128,7 +128,7 @@ namespace DalilAcademy.Infra.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("DalilAcademy.Core.Entites.Course", b =>
+            modelBuilder.Entity("DalilAcademy.Core.Entities.Course", b =>
                 {
                     b.HasOne("DalilAcademy.Core.Entities.Instructor", "Instructor")
                         .WithMany("Courses")
@@ -141,7 +141,7 @@ namespace DalilAcademy.Infra.Migrations
 
             modelBuilder.Entity("DalilAcademy.Core.Entities.Enrollment", b =>
                 {
-                    b.HasOne("DalilAcademy.Core.Entites.Course", "Course")
+                    b.HasOne("DalilAcademy.Core.Entities.Course", "Course")
                         .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -158,7 +158,7 @@ namespace DalilAcademy.Infra.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("DalilAcademy.Core.Entites.Course", b =>
+            modelBuilder.Entity("DalilAcademy.Core.Entities.Course", b =>
                 {
                     b.Navigation("Enrollments");
                 });

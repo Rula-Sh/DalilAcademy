@@ -1,10 +1,8 @@
 ﻿using DalilAcademy.Core.DTOs;
-using DalilAcademy.Core.Entites;
 using DalilAcademy.Core.Exceptions;
 using DalilAcademy.Core.Mappings;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
-using DalilAcademy.Core.Validators;
 using FluentValidation;
 
 namespace DalilAcademy.Infra.Service

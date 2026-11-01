@@ -1,4 +1,4 @@
-﻿using DalilAcademy.Core.Entites;
+﻿using DalilAcademy.Core.Entities;
 using DalilAcademy.Core.Exceptions;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Infra.Data;

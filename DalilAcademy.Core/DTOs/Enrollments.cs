@@ -1,5 +1,3 @@
-﻿using DalilAcademy.Core.Entites;
-
 namespace DalilAcademy.Core.DTOs
 {
     public record CreateEnrollmentDto(int StudentId, int CourseId);

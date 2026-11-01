@@ -1,8 +1,6 @@
 ﻿using DalilAcademy.Core.DTOs;
-using DalilAcademy.Core.Entites;
 using DalilAcademy.Core.Service;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace DalilAcademy.API.Controllers
 {

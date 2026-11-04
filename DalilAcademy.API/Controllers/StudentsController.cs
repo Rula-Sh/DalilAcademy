@@ -10,14 +10,33 @@ namespace DalilAcademy.API.Controllers
     public class StudentsController(IStudentService studentService) : ControllerBase
     {
         [HttpGet]
+        [Route("all")]
         public async Task<ActionResult<List<Student>>> GetAll()
         {
             return Ok(await studentService.GetAllAsync());
         }
 
         [HttpGet]
+        public async Task<ActionResult<PageResult<StudentResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await studentService.GetPageAsync(page, pageSize));
+        }
+
+
+        [HttpGet]
+        [Route("{id:int}/courses")]
+        public async Task<ActionResult<PageResult<CourseResponseDto>>> GetCoursesInPage(int id,[FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await studentService.GetCoursesInPageAsync(id, page, pageSize));
+        }
+
+        [HttpGet]
         [Route("{id:int}")]
-        public async Task<ActionResult<Student>> GetById(int id)
+        public async Task<ActionResult<StudentResponseDto>> GetById(int id)
         {
             var student = await studentService.GetByIdAsync(id);
             if (student is null)
@@ -27,7 +46,7 @@ namespace DalilAcademy.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Student>> Create(CreateStudentDto dto)
+        public async Task<ActionResult<StudentResponseDto>> Create(CreateStudentDto dto)
         {
             var created = await studentService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);

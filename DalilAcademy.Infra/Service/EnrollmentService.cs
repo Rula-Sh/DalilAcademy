@@ -13,6 +13,10 @@ namespace DalilAcademy.Infra.Service
         {
             return enrollments.GetAllAsync();
         }
+        public Task<PageResult<EnrollmentResponseDto>> GetPageAsync(int page, int pageSize)
+        {
+            return enrollments.GetPageAsync(page, pageSize);
+        }
         public async Task<EnrollmentResponseDto?> GetByIdAsync(int id)
         {
             var enrollment = await enrollments.GetByIdAsync(id) ?? throw new NotFoundException($"Enrollment with ID {id} was not found");
@@ -21,16 +25,14 @@ namespace DalilAcademy.Infra.Service
         public async Task<EnrollmentResponseDto> EnrollAsync(int studentId, int courseId)
         {
             if (await students.GetByIdAsync(studentId) is null)
-                throw new KeyNotFoundException("Student not found.");
+                throw new NotFoundException("Student not found.");
 
             if (await courses.GetByIdAsync(courseId) is null)
-                throw new KeyNotFoundException("Course not found.");
-
+                throw new NotFoundException("Course not found.");
 
             var dto = new CreateEnrollmentDto(studentId, courseId);
 
             await validator.ValidateAndThrowAsync(dto);
-
 
             var enrollment = dto.ToEntity();
             var created = await enrollments.EnrollAsync(enrollment); // unique index: already enrolled → 409

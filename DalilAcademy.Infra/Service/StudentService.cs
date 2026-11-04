@@ -1,4 +1,5 @@
 ﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Exceptions;
 using DalilAcademy.Core.Mappings;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
@@ -8,14 +9,22 @@ namespace DalilAcademy.Infra.Service
 {
     public class StudentService(IStudentRepository studentRepository, IValidator<CreateStudentDto> validator) : IStudentService
     {
-        public async Task<List<StudentResponseDto>> GetAllAsync()
+        public Task<List<StudentResponseDto>> GetAllAsync()
         {
-            var students = await studentRepository.GetAllAsync();
-            return students.Select(s => s.ToDto()).ToList();
+            return studentRepository.GetAllAsync();
+        }
+
+        public Task<PageResult<StudentResponseDto>> GetPageAsync(int page, int pageSize)
+        {
+            return studentRepository.GetPageAsync(page, pageSize);
+        }
+        public Task<PageResult<CourseResponseDto>> GetCoursesInPageAsync(int id, int page, int pageSize)
+        {
+            return studentRepository.GetCoursesInPageAsync(id, page, pageSize);
         }
         public async Task<StudentResponseDto?> GetByIdAsync(int id)
         {
-            var student = await studentRepository.GetByIdAsync(id) ?? throw new DirectoryNotFoundException($"Student with ID {id} was not found");
+            var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found");
             return student?.ToDto();
         }
         public async Task<StudentResponseDto> CreateAsync(CreateStudentDto dto)
@@ -28,7 +37,7 @@ namespace DalilAcademy.Infra.Service
         }
         public async Task UpdateAsync(int id, UpdateStudentDto input)
         {
-            var student = await studentRepository.GetByIdAsync(id) ?? throw new DirectoryNotFoundException($"Student with ID {id} was not found"); ;
+            var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found"); ;
 
             student.FullName = input.FullName;
             student.Email = input.Email;
@@ -38,7 +47,7 @@ namespace DalilAcademy.Infra.Service
         public async Task DeleteAsync(int id)
         {
             if (!await studentRepository.DeleteAsync(id))
-                throw new DirectoryNotFoundException($"Student with ID {id} was not found");
+                throw new NotFoundException($"Student with ID {id} was not found");
         }
     }
 }

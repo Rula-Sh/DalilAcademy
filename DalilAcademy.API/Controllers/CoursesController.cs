@@ -8,13 +8,39 @@ namespace DalilAcademy.API.Controllers
     [ApiController] // marks the class as an API controller (adds helpful API defaults, like returning 400 errors automatically when input is invalid)
     public class CoursesController(ICourseService courseService) : ControllerBase // Primary Contstructor 
     {
+        [HttpGet]
+        [Route("count")]
+        public async Task<ActionResult<int>> GetAllCount()
+        {
+            return Ok(await courseService.GetCountAsync());
+        }
 
         [HttpGet]
+        [Route("all")]
         // not having a Route attribute means that it will pull the controller Route attribute
         //[Route("get-all-courses")] // https:localhost/port#/api/courses/get-all-courses (if u wanted a custom url)
         public async Task<ActionResult<List<CourseResponseDto>>> GetAll()
         {
             return Ok(await courseService.GetAllAsync());
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PageResult<CourseResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await courseService.GetPageAsync(page, pageSize));
+        }
+
+        [HttpGet]
+        [Route("filter-by-price")]
+        public async Task<ActionResult<PageResult<CourseResponseDto>>> FilterByPricePage([FromQuery] int min = 0, [FromQuery] int max = 9999, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            min = Math.Max(min, 0);
+            max = Math.Min(max, 9999);
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await courseService.GetByPricePageAsync(min, max, page, pageSize));
         }
 
         [HttpGet]
@@ -50,11 +76,8 @@ namespace DalilAcademy.API.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<ActionResult> Update(int id, Course course)
+        public async Task<ActionResult> Update(int id, UpdateCourseDto course)
         {
-            if (id != course.Id)
-                return BadRequest();
-
             await courseService.UpdateAsync(id, course);
             return NoContent();
         }

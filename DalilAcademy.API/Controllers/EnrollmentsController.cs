@@ -9,9 +9,18 @@ namespace DalilAcademy.API.Controllers
     public class EnrollmentsController(IEnrollmentService enrollmentService) : ControllerBase
     {
         [HttpGet]
+        [Route("all")]
         public async Task<ActionResult<List<EnrollmentResponseDto>>> GetAll()
         {
             return Ok(await enrollmentService.GetAllAsync());
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PageResult<EnrollmentResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await enrollmentService.GetPageAsync(page, pageSize));
         }
 
         [HttpGet]

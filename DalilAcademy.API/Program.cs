@@ -1,5 +1,6 @@
 using DalilAcademy.API.Middleware;
 using DalilAcademy.Core.Repository;
+using DalilAcademy.Core.Security;
 using DalilAcademy.Core.Service;
 using DalilAcademy.Core.Validators;
 using DalilAcademy.Infra.Data;
@@ -10,6 +11,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +31,18 @@ builder.Services.AddSwaggerGen(options => // creates the file that describes the
         Version = "v1",
         Description = "Learning Management System API built with ASP.NET Core 10"
     });
+    // add authorization option in swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Paste the token from /api/Auth/login"
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
 });
 
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
@@ -37,6 +51,10 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>(); // used AddSingleton because nothing will changes between the requests (does not rely on DbContext), one version is enough
+builder.Services.AddSingleton<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -66,7 +84,7 @@ options.TokenValidationParameters = new TokenValidationParameters
     // IssuerSigningKey is the key that we used in the user secret 
     // SymmetricSecurityKey signes the token and checks it (the server can only do that)
     // Encoding.UTF8.GetBytes() converts the string to byte
-    ClockSkew = TimeSpan.FromMinutes(1)  // the tocken is valid for 1 minute here after its expiration (used just incase the server time was different from the client side)
+    ClockSkew = TimeSpan.FromMinutes(1)  // the token is valid for 1 minute here after its expiration (used just incase the server time was different from the client side)
 });
 builder.Services.AddAuthorization();
 

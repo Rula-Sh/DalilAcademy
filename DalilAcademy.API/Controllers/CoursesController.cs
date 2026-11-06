@@ -1,15 +1,19 @@
 ﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Entities;
 using DalilAcademy.Core.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DalilAcademy.API.Controllers
 {
     [Route("api/[controller]")] // Route attribute
     [ApiController] // marks the class as an API controller (adds helpful API defaults, like returning 400 errors automatically when input is invalid)
+    [Authorize]
     public class CoursesController(ICourseService courseService) : ControllerBase // Primary Contstructor 
     {
         [HttpGet]
         [Route("count")]
+        [AllowAnonymous]
         public async Task<ActionResult<int>> GetAllCount()
         {
             return Ok(await courseService.GetCountAsync());
@@ -19,12 +23,14 @@ namespace DalilAcademy.API.Controllers
         [Route("all")]
         // not having a Route attribute means that it will pull the controller Route attribute
         //[Route("get-all-courses")] // https:localhost/port#/api/courses/get-all-courses (if u wanted a custom url)
+        [AllowAnonymous]
         public async Task<ActionResult<List<CourseResponseDto>>> GetAll()
         {
             return Ok(await courseService.GetAllAsync());
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<PageResult<CourseResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             page = Math.Max(page, 1);
@@ -34,6 +40,7 @@ namespace DalilAcademy.API.Controllers
 
         [HttpGet]
         [Route("filter-by-price")]
+        [AllowAnonymous]
         public async Task<ActionResult<PageResult<CourseResponseDto>>> FilterByPricePage([FromQuery] int min = 0, [FromQuery] int max = 9999, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             min = Math.Max(min, 0);
@@ -45,6 +52,7 @@ namespace DalilAcademy.API.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<CourseResponseDto>> GetById(int id)
         {
             var course = await courseService.GetByIdAsync(id);
@@ -55,6 +63,7 @@ namespace DalilAcademy.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<CourseResponseDto>> Create(CreateCourseDto dto)
         {
             //try
@@ -76,6 +85,7 @@ namespace DalilAcademy.API.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult> Update(int id, UpdateCourseDto course)
         {
             await courseService.UpdateAsync(id, course);
@@ -84,6 +94,7 @@ namespace DalilAcademy.API.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult> Delete(int id)
         {
             await courseService.DeleteAsync(id);

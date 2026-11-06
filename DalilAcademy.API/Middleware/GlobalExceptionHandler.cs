@@ -17,6 +17,7 @@ namespace DalilAcademy.API.Middleware
                 ValidationException => (400, "Validation failed"),
                 NotFoundException => (404, "Resource not found"),
                 ConflictException => (409, "Conflict"),
+                UnauthorizedException => (401, "Unauthorized"),
                 _ => (500, "An unexpected error occurred")
             };
             if (status == 500) logger.LogError(exception, "Unhandled exception");
@@ -26,7 +27,7 @@ namespace DalilAcademy.API.Middleware
             {
                 Status = status,
                 Title = title,
-                Detail = exception is NotFoundException or ConflictException ? exception.Message : null
+                Detail = exception is NotFoundException or ConflictException or UnauthorizedException ? exception.Message : null
             };
             if (exception is ValidationException ve)
                 problem.Extensions["errors"] = ve.Errors.GroupBy(e => e.PropertyName)

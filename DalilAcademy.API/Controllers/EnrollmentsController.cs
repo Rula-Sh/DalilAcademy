@@ -1,11 +1,16 @@
 ﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Entities;
+using DalilAcademy.Core.Exceptions;
 using DalilAcademy.Core.Service;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DalilAcademy.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EnrollmentsController(IEnrollmentService enrollmentService) : ControllerBase
     {
         [HttpGet]
@@ -21,6 +26,24 @@ namespace DalilAcademy.API.Controllers
             page = Math.Max(page, 1);
             pageSize = Math.Clamp(pageSize, 1, 50);
             return Ok(await enrollmentService.GetPageAsync(page, pageSize));
+        }
+
+        [HttpGet]
+        [Route("me")]
+        [Authorize(Roles = Roles.Student)]
+        public async Task<ActionResult<List<StudentEnrollmentsResponseDto>>> GetStudentEnrollments([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+
+            string? token = await HttpContext.GetTokenAsync("access_token");
+
+            int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+
+            if (userId is 0 || token is null)
+                new UnauthorizedException("You are not logged in.");
+
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await enrollmentService.GetStudentEnrollmentsAsync(userId, page, pageSize));
         }
 
         [HttpGet]

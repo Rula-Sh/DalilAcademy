@@ -12,7 +12,8 @@ namespace DalilAcademy.Infra.Data.Configurations
             builder.Property(s => s.FullName).IsRequired().HasMaxLength(200);
             builder.Property(s => s.Email).IsRequired().HasMaxLength(256);
             builder.HasIndex(s => s.Email).IsUnique();
-            builder.HasMany(s => s.Enrollments).WithOne(e => e.Student).HasForeignKey(e => e.StudentId);
+            builder.HasMany(s => s.Enrollments).WithOne(e => e.Student).HasForeignKey(e => e.StudentId); 
+            builder.HasIndex(s => s.UserId).IsUnique();
         }
     }
 }

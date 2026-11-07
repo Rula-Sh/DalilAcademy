@@ -25,6 +25,18 @@ namespace DalilAcademy.Infra.Repository
                 .ToListAsync();
             return new PageResult<EnrollmentResponseDto>(items, page, pageSize, count);
         }
+        public async Task<PageResult<StudentEnrollmentsResponseDto>> GetStudentEnrollmentsAsync(int studentId, int page, int pageSize)
+        {
+            var count= await db.Enrollments.Where(e=> e.StudentId == studentId).CountAsync();
+            var items = await db.Enrollments
+                .OrderBy(c => c.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Where(e => e.StudentId == studentId)
+                .Select(e => new StudentEnrollmentsResponseDto(e.Course!.Title, e.EnrolledtAt))
+                .ToListAsync();
+            return new PageResult<StudentEnrollmentsResponseDto>(items, page, pageSize, count);
+        }
         public async Task<Enrollment?> GetByIdAsync(int id)
         {
             return await db.Enrollments.Include(e => e.Student).Include(e => e.Course).FirstOrDefaultAsync(e => e.Id == id);

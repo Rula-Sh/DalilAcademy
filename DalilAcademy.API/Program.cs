@@ -62,6 +62,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCourseDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateStudentDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateEnrollmentDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterStudentDtoValidator>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

@@ -41,6 +41,12 @@ namespace DalilAcademy.Infra.Repository
         {
             return await db.Students.FindAsync(id);
         }
+        public async Task<Student?> GetByUserIdAsync(int id)
+        {
+            var student = await db.Students.FirstOrDefaultAsync(s => s.UserId == id);
+
+            return student;
+        }
         public async Task<Student> CreateAsync(Student student)
         {
             try
@@ -65,7 +71,7 @@ namespace DalilAcademy.Infra.Repository
             catch (DbUpdateException ex)
             when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
-                throw new ArgumentException("A student with this email already exists.");
+                throw new ConflictException("A student with this email already exists.");
             }
         }
         public async Task<bool> DeleteAsync(int id)

@@ -17,6 +17,17 @@ namespace DalilAcademy.Infra.Service
         {
             return enrollments.GetPageAsync(page, pageSize);
         }
+
+        public async Task<PageResult<StudentEnrollmentsResponseDto>> GetStudentEnrollmentsAsync(int userId, int page, int pageSize)
+        {
+            var student = await students.GetByUserIdAsync(userId);
+
+            if (student is null)
+                throw new NotFoundException($"Student with UserId {userId} was not found.");
+
+            return await enrollments.GetStudentEnrollmentsAsync(student!.Id, page, pageSize);
+        }
+
         public async Task<EnrollmentResponseDto?> GetByIdAsync(int id)
         {
             var enrollment = await enrollments.GetByIdAsync(id) ?? throw new NotFoundException($"Enrollment with ID {id} was not found");

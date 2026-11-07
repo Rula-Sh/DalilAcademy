@@ -7,9 +7,14 @@ namespace DalilAcademy.Infra.Repository
 {
     public class UserRepository(AppDbContext db) : IUserRepository
     {
-        public Task<User?> GetByEmailAsync(string email) => 
+        public Task<User?> GetByEmailAsync(string email) =>
             db.Users
             .AsNoTracking() // used to stop tracking the object to update it incase any changes occurred on it, it saves more memory and time in large databases
-            .FirstOrDefaultAsync(u => u.Email == email);        
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        public async Task<User?> GetByIdAsync(int id)
+        {
+            return await db.Users.FindAsync(id);
+        }
     }
 }

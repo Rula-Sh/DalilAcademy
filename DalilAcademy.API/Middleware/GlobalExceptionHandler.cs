@@ -16,6 +16,8 @@ namespace DalilAcademy.API.Middleware
             {
                 ValidationException => (400, "Validation failed"),
                 NotFoundException => (404, "Resource not found"),
+                BadRequestException => (400, "Bad request"),
+                InvalidFileException => (400, "Invalid File"),
                 ConflictException => (409, "Conflict"),
                 UnauthorizedException => (401, "Unauthorized"),
                 _ => (500, "An unexpected error occurred")
@@ -27,7 +29,7 @@ namespace DalilAcademy.API.Middleware
             {
                 Status = status,
                 Title = title,
-                Detail = exception is NotFoundException or ConflictException or UnauthorizedException ? exception.Message : null
+                Detail = exception is NotFoundException or BadRequestException or InvalidFileException or ConflictException or UnauthorizedException ? exception.Message : null
             };
             if (exception is ValidationException ve)
                 problem.Extensions["errors"] = ve.Errors.GroupBy(e => e.PropertyName)

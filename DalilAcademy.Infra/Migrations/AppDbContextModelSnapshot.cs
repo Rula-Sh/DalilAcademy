@@ -30,6 +30,9 @@ namespace DalilAcademy.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<int>("InstructorId")
                         .HasColumnType("integer");
 
@@ -192,6 +195,15 @@ namespace DalilAcademy.Infra.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("DalilAcademy.Core.Entities.Student", b =>
+                {
+                    b.HasOne("DalilAcademy.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DalilAcademy.Core.Entities.Course", b =>

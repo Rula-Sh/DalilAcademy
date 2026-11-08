@@ -31,7 +31,7 @@ namespace DalilAcademy.Infra.Repository
             //var count = await db.Courses.CountAsync(); // if i wanted to get the number of courses, this is the best approach, to count it from the DB, rather than counting them using C#
 
             // Include is best used for updates and business logic, While Select is for GET endpoints
-            return await db.Courses.Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName)).ToListAsync(); // updated the function return type to CourseResponseDto
+            return await db.Courses.Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName, c.ImageUrl)).ToListAsync(); // updated the function return type to CourseResponseDto
         }
         public async Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize)
         {
@@ -40,7 +40,7 @@ namespace DalilAcademy.Infra.Repository
                 .OrderBy(c => c.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName))
+                .Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName, c.ImageUrl))
                 .ToListAsync();
             return new PageResult<CourseResponseDto>(items, page, pageSize, count);
         }
@@ -52,7 +52,7 @@ namespace DalilAcademy.Infra.Repository
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Where(c => c.Price >= min && c.Price <= max)
-                .Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName))
+                .Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName, c.ImageUrl))
                 .ToListAsync();
             return new PageResult<CourseResponseDto>(items, page, pageSize, count);
         }

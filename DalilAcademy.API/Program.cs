@@ -2,11 +2,13 @@ using DalilAcademy.API.Middleware;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Security;
 using DalilAcademy.Core.Service;
+using DalilAcademy.Core.Storage;
 using DalilAcademy.Core.Validators;
 using DalilAcademy.Infra.Data;
 using DalilAcademy.Infra.Repository;
 using DalilAcademy.Infra.Security;
 using DalilAcademy.Infra.Service;
+using DalilAcademy.Infra.Storage;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +57,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>(); // used AddSingleton because nothing will changes between the requests (does not rely on DbContext), one version is enough
 builder.Services.AddSingleton<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<IImageService, LocalImageService>();
+
+builder.Services.Configure<ImageStorageOptions>(o =>
+    o.RootPath = builder.Environment.WebRootPath ?? Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "images", "courses"));
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -115,8 +121,9 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection(); // converts every http request to https
 
-app.UseAuthentication();
+app.UseStaticFiles(); // allows reading files from wwwroot folder
 
+app.UseAuthentication(); // checks if the sender is logged in (based on the request if it requires a logged in user)
 app.UseAuthorization(); // checks the sender authorization, if his request is permissible or not
 
 app.MapControllers(); // sends the request to the suitable controller

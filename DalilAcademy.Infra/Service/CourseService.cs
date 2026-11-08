@@ -3,11 +3,12 @@ using DalilAcademy.Core.Exceptions;
 using DalilAcademy.Core.Mappings;
 using DalilAcademy.Core.Repository;
 using DalilAcademy.Core.Service;
+using DalilAcademy.Core.Storage;
 using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class CourseService(ICourseRepository courseRepository, IValidator<CreateCourseDto> validator) : ICourseService
+    public class CourseService(ICourseRepository courseRepository, IValidator<CreateCourseDto> validator, IImageService images) : ICourseService
     {
         public Task<int> GetCountAsync()
         {
@@ -50,12 +51,18 @@ namespace DalilAcademy.Infra.Service
             course.Title = input.Title;
             course.Price = input.Price;
 
+            var oldImage = course.ImageUrl;
+            course.Title = input.Title; course.Price = input.Price; course.ImageUrl = input.ImageUrl;
             await courseRepository.UpdateAsync(course);
+
+            if (oldImage != input.ImageUrl)
+                images.DeleteCourseImage(oldImage);
         }
         public async Task DeleteAsync(int id)
         {
-            if (!await courseRepository.DeleteAsync(id))
-                throw new NotFoundException($"Course with ID {id} was not found");
+            var course = await courseRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Course with ID {id} was not found");
+            await courseRepository.DeleteAsync(id);
+            images.DeleteCourseImage(course.ImageUrl);
         }
     }
 }

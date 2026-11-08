@@ -33,7 +33,7 @@ namespace DalilAcademy.Infra.Repository
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Where(e => e.StudentId == id)
-                .Select(e => new CourseResponseDto(e.Course!.Id, e.Course.Title, e.Course.Price, e.Course.Instructor!.FullName))
+                .Select(e => new CourseResponseDto(e.Course!.Id, e.Course.Title, e.Course.Price, e.Course.Instructor!.FullName, e.Course.ImageUrl))
                 .ToListAsync();
             return new PageResult<CourseResponseDto>(items, page, pageSize, count);
         }

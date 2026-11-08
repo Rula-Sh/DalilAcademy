@@ -17,6 +17,11 @@ namespace DalilAcademy.Core.Validators
 
             RuleFor(x => x.InstructorId)
                 .GreaterThan(0);
+
+            RuleFor(x => x.ImageUrl)
+                .Must(url => url is null || (url.StartsWith("/images/courses/") && !url.Contains("..")))
+                .WithMessage("ImageUrl must come from the upload endpoint."); 
+            // without it, a client could send "../../appsettings.json" as an image URL — and a later delete would remove it.
         }
     }
 }

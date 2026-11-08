@@ -2,14 +2,16 @@
 using DalilAcademy.Core.Entities;
 using DalilAcademy.Core.Service;
 using Microsoft.AspNetCore.Authorization;
+using DalilAcademy.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using DalilAcademy.Core.Storage;
 
 namespace DalilAcademy.API.Controllers
 {
     [Route("api/[controller]")] // Route attribute
     [ApiController] // marks the class as an API controller (adds helpful API defaults, like returning 400 errors automatically when input is invalid)
     [Authorize]
-    public class CoursesController(ICourseService courseService) : ControllerBase // Primary Contstructor 
+    public class CoursesController(ICourseService courseService, IImageService images) : ControllerBase // Primary Contstructor 
     {
         [HttpGet]
         [Route("count")]
@@ -43,6 +45,9 @@ namespace DalilAcademy.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<PageResult<CourseResponseDto>>> FilterByPricePage([FromQuery] int min = 0, [FromQuery] int max = 9999, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
+            if (max < min)
+                throw new BadRequestException("Cannot set the max price value less than the min.");
+
             min = Math.Max(min, 0);
             max = Math.Min(max, 9999);
             page = Math.Max(page, 1);
@@ -99,6 +104,17 @@ namespace DalilAcademy.API.Controllers
         {
             await courseService.DeleteAsync(id);
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("upload-image")]
+        [Authorize(Roles = Roles.Admin)]
+        [RequestSizeLimit(3 * 1024 * 1024)] // Kestrel rejects bigger requests early (Kestrel exists between the client request and the ASP.NET Core app )
+        public async Task<ActionResult<ImageUploadResponseDto>> UploadImage(IFormFile file)
+        {
+            await using var stream = file.OpenReadStream();
+            var url = await images.SaveCourseImageAsync(stream, file.FileName, file.Length);
+            return Ok(new ImageUploadResponseDto(url));
         }
 
         // run the project, then test the API URLs on Postman to check if the code works

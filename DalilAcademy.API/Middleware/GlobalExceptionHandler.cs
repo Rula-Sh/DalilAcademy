@@ -20,6 +20,7 @@ namespace DalilAcademy.API.Middleware
                 InvalidFileException => (400, "Invalid File"),
                 ConflictException => (409, "Conflict"),
                 UnauthorizedException => (401, "Unauthorized"),
+                HttpRequestException => (502, "External service unavailable"),
                 _ => (500, "An unexpected error occurred")
             };
             if (status == 500) logger.LogError(exception, "Unhandled exception");
@@ -29,7 +30,9 @@ namespace DalilAcademy.API.Middleware
             {
                 Status = status,
                 Title = title,
-                Detail = exception is NotFoundException or BadRequestException or InvalidFileException or ConflictException or UnauthorizedException ? exception.Message : null
+                Detail = exception is NotFoundException or BadRequestException or 
+                    InvalidFileException or ConflictException or UnauthorizedException or HttpRequestException 
+                    ? exception.Message : null
             };
             if (exception is ValidationException ve)
                 problem.Extensions["errors"] = ve.Errors.GroupBy(e => e.PropertyName)

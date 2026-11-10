@@ -12,7 +12,7 @@ namespace DalilAcademy.Infra.Repository
     {
         public async Task<List<EnrollmentResponseDto>> GetAllAsync()
         {
-            return await db.Enrollments.Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledtAt)).ToListAsync();
+            return await db.Enrollments.Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledAt)).ToListAsync();
         }
         public async Task<PageResult<EnrollmentResponseDto>> GetPageAsync(int page, int pageSize)
         {
@@ -21,7 +21,7 @@ namespace DalilAcademy.Infra.Repository
                 .OrderBy(c => c.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledtAt))
+                .Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledAt))
                 .ToListAsync();
             return new PageResult<EnrollmentResponseDto>(items, page, pageSize, count);
         }
@@ -33,7 +33,7 @@ namespace DalilAcademy.Infra.Repository
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Where(e => e.StudentId == studentId)
-                .Select(e => new StudentEnrollmentsResponseDto(e.Course!.Title, e.EnrolledtAt))
+                .Select(e => new StudentEnrollmentsResponseDto(e.Course!.Title, e.EnrolledAt))
                 .ToListAsync();
             return new PageResult<StudentEnrollmentsResponseDto>(items, page, pageSize, count);
         }

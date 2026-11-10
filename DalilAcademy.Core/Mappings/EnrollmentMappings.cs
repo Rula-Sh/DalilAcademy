@@ -7,7 +7,7 @@ namespace DalilAcademy.Core.Mappings
     {
         public static EnrollmentResponseDto ToDto(this Enrollment enrollment) // to make it an extention method, make the class and method static, and add this in the method parameter
         {
-            return new EnrollmentResponseDto(enrollment.Id, enrollment.Student?.FullName, enrollment.Course?.Title, enrollment.EnrolledtAt);
+            return new EnrollmentResponseDto(enrollment.Id, enrollment.Student?.FullName, enrollment.Course?.Title, enrollment.EnrolledAt);
         }
         public static Enrollment ToEntity(this CreateEnrollmentDto dto)
         {
@@ -15,7 +15,7 @@ namespace DalilAcademy.Core.Mappings
             {
                 StudentId = dto.StudentId,
                 CourseId = dto.CourseId,
-                EnrolledtAt = DateTime.UtcNow
+                EnrolledAt = DateTime.UtcNow
             };
         }
     }

@@ -8,6 +8,6 @@ namespace DalilAcademy.Core.Entities
 
         public int StudentId { get; set; }
         public Student? Student { get; set; }
-        public DateTime EnrolledtAt { get; set; }
+        public DateTime EnrolledAt { get; set; }
     }
 }

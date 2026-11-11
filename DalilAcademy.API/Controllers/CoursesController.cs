@@ -32,6 +32,14 @@ namespace DalilAcademy.API.Controllers
         }
 
         [HttpGet]
+        [Route("with-enrollments")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult<List<CourseWithEnrollmentsDto>>> GetAllWithEnrollments()
+        {
+            return Ok(await courseService.GetAllWithEnrollmentsAsync());
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<PageResult<CourseResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {

@@ -33,6 +33,11 @@ namespace DalilAcademy.Infra.Repository
             // Include is best used for updates and business logic, While Select is for GET endpoints
             return await db.Courses.Select(c => new CourseResponseDto(c.Id, c.Title, c.Price, c.Instructor!.FullName, c.ImageUrl)).ToListAsync(); // updated the function return type to CourseResponseDto
         }
+        public async Task<List<CourseWithEnrollmentsDto>> GetAllWithEnrollmentsAsync()
+        {
+            return await db.Courses.AsNoTracking().Select(c => new CourseWithEnrollmentsDto(c.Id, c.Title, c.Instructor!.FullName,
+               c.Enrollments.Select(e => new CourseEnrollmentSummaryDto(e.StudentId, e.Student!.FullName, e.Student!.Email, e.EnrolledAt)).ToList())).ToListAsync();
+        }
         public async Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize)
         {
             var count = await db.Courses.CountAsync();

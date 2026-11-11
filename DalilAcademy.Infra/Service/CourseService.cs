@@ -22,6 +22,10 @@ namespace DalilAcademy.Infra.Service
             //return courses.Select(c => c.ToDto()).ToList(); // no longer needed, since i returned the needed data in CourseRepository
             return courseRepository.GetAllAsync();
         }
+        public Task<List<CourseWithEnrollmentsDto>> GetAllWithEnrollmentsAsync()
+        {
+            return courseRepository.GetAllWithEnrollmentsAsync();
+        }
         public Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize)
         {
             return courseRepository.GetPageAsync(page, pageSize);

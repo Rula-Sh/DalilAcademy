@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Npgsql;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,8 +68,11 @@ builder.Services.AddHttpClient<ICurrencyService, CurrencyService>(client =>
     client.BaseAddress = new Uri($"{builder.Configuration["ExchangeRate:BaseUrl"]}{builder.Configuration["ExchangeRate:ApiKey"]}/"); // to get the BaseUrl from appsettings.json and the ApiKey from secrets.json user secrets
 }).AddStandardResilienceHandler(); // AddStandardResilienceHandler is from Microsoft.Extensions.Http.Resilience package, it tries  retries with failed backoff, circuit breaker, timeouts again up to 3 times
 
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connStr = builder.Configuration.GetConnectionString("DefaultConnection"); // Get the base connection string (no password) from appsettings.json
+var connBuilder = new NpgsqlConnectionStringBuilder(connStr); // Build with NpgsqlConnectionStringBuilder
+connBuilder.Password = builder.Configuration["DbPassword"]; // Read the password from user secrets
+builder.Services.AddDbContext<AppDbContext>(options => // Register DbContext with the final complete connection string
+    options.UseNpgsql(connBuilder.ConnectionString));
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCourseDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateStudentDtoValidator>();

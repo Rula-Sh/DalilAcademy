@@ -154,6 +154,9 @@ namespace DalilAcademy.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("RequireUpdatingPassword")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -200,8 +203,9 @@ namespace DalilAcademy.Infra.Migrations
             modelBuilder.Entity("DalilAcademy.Core.Entities.Student", b =>
                 {
                     b.HasOne("DalilAcademy.Core.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne()
+                        .HasForeignKey("DalilAcademy.Core.Entities.Student", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });

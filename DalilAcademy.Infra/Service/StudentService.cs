@@ -1,4 +1,5 @@
 ﻿using DalilAcademy.Core.DTOs;
+using DalilAcademy.Core.Entities;
 using DalilAcademy.Core.Exceptions;
 using DalilAcademy.Core.Mappings;
 using DalilAcademy.Core.Repository;
@@ -13,7 +14,6 @@ namespace DalilAcademy.Infra.Service
         {
             return studentRepository.GetAllAsync();
         }
-
         public Task<PageResult<StudentResponseDto>> GetPageAsync(int page, int pageSize)
         {
             return studentRepository.GetPageAsync(page, pageSize);
@@ -27,13 +27,26 @@ namespace DalilAcademy.Infra.Service
             var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found");
             return student?.ToDto();
         }
-        public async Task<StudentResponseDto> CreateAsync(CreateStudentDto dto)
+        public async Task<StudentResponseDto> CreateAsync(CreateStudentDto dto, string hashPass)
+        {
+            var created = await CreateStudentUserCoreAsync(dto, hashPass, requireUpdatingPassword: false);
+            return created.ToDto();
+        }
+        public async Task<User> RegisterAsync(CreateStudentDto dto, string hashPass)
+        {
+            var created = await CreateStudentUserCoreAsync(dto, hashPass, requireUpdatingPassword: true);
+            return created.ToUserEntity();
+        }
+        private async Task<Student> CreateStudentUserCoreAsync(CreateStudentDto dto, string hashPass, bool requireUpdatingPassword)
         {
             await validator.ValidateAndThrowAsync(dto);
 
             var student = dto.ToEntity();
+            student.User = dto.ToUserEntity(hashPass);
+            student.User.RequireUpdatingPassword = requireUpdatingPassword;
             var created = await studentRepository.CreateAsync(student);
-            return created.ToDto();
+
+            return created;
         }
         public async Task UpdateAsync(int id, UpdateStudentDto input)
         {

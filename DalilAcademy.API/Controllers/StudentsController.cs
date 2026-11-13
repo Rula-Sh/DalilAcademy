@@ -9,7 +9,7 @@ namespace DalilAcademy.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = Roles.Admin)]
-    public class StudentsController(IStudentService studentService) : ControllerBase
+    public class StudentsController(IStudentService studentService, IAuthService authService) : ControllerBase
     {
         [HttpGet]
         [Route("all")]
@@ -25,7 +25,6 @@ namespace DalilAcademy.API.Controllers
             pageSize = Math.Clamp(pageSize, 1, 50);
             return Ok(await studentService.GetPageAsync(page, pageSize));
         }
-
 
         [HttpGet]
         [Route("{id:int}/courses")]
@@ -50,7 +49,7 @@ namespace DalilAcademy.API.Controllers
         [HttpPost]
         public async Task<ActionResult<StudentResponseDto>> Create(CreateStudentDto dto)
         {
-            var created = await studentService.CreateAsync(dto);
+            var created = await authService.RegisterStudentByAdminAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 

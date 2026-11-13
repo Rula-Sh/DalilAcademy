@@ -16,5 +16,10 @@ namespace DalilAcademy.Infra.Repository
         {
             return await db.Users.FindAsync(id);
         }
+        public async Task UpdatePasswordAsync(User user)
+        {
+                db.Users.Update(user);
+                await db.SaveChangesAsync();
+        }
     }
 }

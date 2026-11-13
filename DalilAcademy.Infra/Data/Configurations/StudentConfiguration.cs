@@ -14,6 +14,10 @@ namespace DalilAcademy.Infra.Data.Configurations
             builder.HasIndex(s => s.Email).IsUnique();
             builder.HasMany(s => s.Enrollments).WithOne(e => e.Student).HasForeignKey(e => e.StudentId); 
             builder.HasIndex(s => s.UserId).IsUnique();
+            builder.HasOne(s => s.User)
+               .WithOne()
+               .HasForeignKey<Student>(s => s.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -6,5 +6,6 @@ namespace DalilAcademy.Core.Repository
     {
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByIdAsync(int id);
+        Task UpdatePasswordAsync(User user);
     }
 }

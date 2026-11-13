@@ -7,7 +7,6 @@ namespace DalilAcademy.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous] // anyone can login
     public class AuthController(IAuthService auth) : ControllerBase
     {
         [HttpPost("login")]
@@ -17,10 +16,15 @@ namespace DalilAcademy.API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<ActionResult<LoginResponseDto>> RegisterStudent(RegisterStudentDto dto)
+        public async Task<ActionResult<LoginResponseDto>> RegisterStudent(CreateStudentDto dto)
         {
             var created = await auth.RegisterStudentAsync(dto);
             return Ok(created);
         }
+
+        [HttpPost("update-password")]
+        [Authorize]
+        public async Task<ActionResult<LoginResponseDto>> UpdatePassword(UpdatePasswordDto dto) =>
+            Ok(await auth.UpdatePasswordAsync(dto));
     }
 }

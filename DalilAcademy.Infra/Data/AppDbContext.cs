@@ -50,21 +50,24 @@ namespace DalilAcademy.Infra.Data
                     {
                         Email = "admin@dalil.jo",
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
-                        Role = Roles.Admin
+                        Role = Roles.Admin,
+                        RequireUpdatingPassword = true
                     });
 
                     context.Set<User>().Add(new User
                     {
                         Email = "instructor@dalil.jo",
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Instructor@123"),
-                        Role = Roles.Instructor
+                        Role = Roles.Instructor,
+                        RequireUpdatingPassword = true
                     });
 
                     context.Set<User>().Add(new User
                     {
                         Email = "student@dalil.jo",
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Student@123"),
-                        Role = Roles.Student
+                        Role = Roles.Student,
+                        RequireUpdatingPassword = true
                     });
                 }
                 context.SaveChanges();

@@ -24,51 +24,47 @@ namespace DalilAcademy.Infra.Data
             // Runs automatically on Update-Database
             optionsBuilder.UseSeeding((context, _) =>
             {
-                if (!context.Set<Student>().Any()) // Seeds only once (works every time we update the database, without this line, it will add all the data again)
-                {
-                    var qasem = new Student { FullName = "Qasem Ali", Email = "qasemali@gmail.com", Level = 1 };
-                    var basem = new Student { FullName = "Basem Amjad", Email = "basemamjad@gmail.com", Level = 2 };
-                }
-
-                if (!context.Set<Instructor>().Any())
-                {
-                    var ahmad = new Instructor { FullName = "Ahmad Ali" };
-                    var raghad = new Instructor { FullName = "Raghad Amjad" };
-
-                    if (!context.Set<Course>().Any())
-                    {
-                        context.Set<Course>().AddRange(
-                            new Course { Title = "C# Fundamentals", Price = 500, Instructor = ahmad },
-                            new Course { Title = "ASP.NET Core Web API", Price = 600, Instructor = raghad }
-                        );
-                    }
-                }
-
                 if (!context.Set<User>().Any())
                 {
-                    context.Set<User>().Add(new User
-                    {
-                        Email = "admin@dalil.jo",
-                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
-                        Role = Roles.Admin,
-                        RequireUpdatingPassword = true
-                    });
+                    context.Set<User>().Add(new User { Email = "admin@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"), Role = Roles.Admin, RequireUpdatingPassword = true });
+                    var instructorUser = new User { Email = "instructor@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Instructor@123"), Role = Roles.Instructor, RequireUpdatingPassword = true };
+                    var studentUser = new User { Email = "student@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Student@123"), Role = Roles.Student, RequireUpdatingPassword = true };
 
-                    context.Set<User>().Add(new User
-                    {
-                        Email = "instructor@dalil.jo",
-                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Instructor@123"),
-                        Role = Roles.Instructor,
-                        RequireUpdatingPassword = true
-                    });
+                    var ahmadAliUser = new User { Email = "ahmadali@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Instructor@123"), Role = Roles.Instructor, RequireUpdatingPassword = true };
+                    var raghadAmjadUser = new User { Email = "raghadAmjad@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Instructor@123"), Role = Roles.Instructor, RequireUpdatingPassword = true };
+                    var qasemaliUser = new User { Email = "qasemali@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Student@123"), Role = Roles.Student, RequireUpdatingPassword = true };
+                    var basemamjadUser = new User { Email = "basemamjad@dalil.jo", PasswordHash = BCrypt.Net.BCrypt.HashPassword("Student@123"), Role = Roles.Student, RequireUpdatingPassword = true };
 
-                    context.Set<User>().Add(new User
+                    if (!context.Set<Student>().Any()) // Seeds only once (works every time we update the database, without this line, it will add all the data again)
                     {
-                        Email = "student@dalil.jo",
-                        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Student@123"),
-                        Role = Roles.Student,
-                        RequireUpdatingPassword = true
-                    });
+                        var student = new Student { FullName = "Student Name", User = studentUser, Level = 1 };
+                        var qasem = new Student { FullName = "Qasem Ali", User = qasemaliUser, Level = 1 };
+                        var basem = new Student { FullName = "Basem Amjad", User = basemamjadUser, Level = 2 };
+                        if (!context.Set<Instructor>().Any())
+                        {
+                            var instructor = new Instructor { FullName = "Instructor Name", User = instructorUser };
+                            var ahmad = new Instructor { FullName = "Ahmad Ali", User = ahmadAliUser };
+                            var raghad = new Instructor { FullName = "Raghad Amjad", User = raghadAmjadUser };
+
+                            if (!context.Set<Course>().Any())
+                            {
+                                context.Set<Course>().AddRange(
+                                    new Course { Title = "Database Postgres", Price = 200, Instructor = instructor },
+                                    new Course { Title = "C# Fundamentals", Price = 500, Instructor = ahmad },
+                                    new Course { Title = "ASP.NET Core Web API", Price = 600, Instructor = raghad }
+                                );
+                            }
+
+                            if (!context.Set<Enrollment>().Any())
+                            {
+                                context.Set<Enrollment>().AddRange(
+                                    new Enrollment { Student = student, CourseId = 1, EnrolledAt = DateTime.UtcNow },
+                                    new Enrollment { Student = qasem, CourseId = 2, EnrolledAt = DateTime.UtcNow },
+                                    new Enrollment { Student = basem, CourseId = 3, EnrolledAt = DateTime.UtcNow }
+                                );
+                            }
+                        }
+                    }
                 }
                 context.SaveChanges();
             });

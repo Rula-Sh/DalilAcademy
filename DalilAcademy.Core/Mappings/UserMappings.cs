@@ -21,7 +21,7 @@ namespace DalilAcademy.Core.Mappings
         {
             return new User
             {
-                Email = dto.Email,
+                Email = dto.User.Email,
                 PasswordHash = dto.User!.PasswordHash,
                 RequireUpdatingPassword = dto.User.RequireUpdatingPassword
             };

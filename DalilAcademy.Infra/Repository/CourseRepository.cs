@@ -36,7 +36,7 @@ namespace DalilAcademy.Infra.Repository
         public async Task<List<CourseWithEnrollmentsDto>> GetAllWithEnrollmentsAsync()
         {
             return await db.Courses.AsNoTracking().Select(c => new CourseWithEnrollmentsDto(c.Id, c.Title, c.Instructor!.FullName,
-               c.Enrollments.Select(e => new CourseEnrollmentSummaryDto(e.StudentId, e.Student!.FullName, e.Student!.Email, e.EnrolledAt)).ToList())).ToListAsync();
+               c.Enrollments.Select(e => new CourseEnrollmentSummaryDto(e.StudentId, e.Student!.FullName, e.Student!.User.Email, e.EnrolledAt)).ToList())).ToListAsync();
         }
         public async Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize)
         {

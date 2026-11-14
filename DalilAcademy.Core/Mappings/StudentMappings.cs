@@ -1,8 +1,5 @@
 ﻿using DalilAcademy.Core.DTOs;
 using DalilAcademy.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DalilAcademy.Core.Mappings
 {
@@ -10,14 +7,14 @@ namespace DalilAcademy.Core.Mappings
     {
         public static StudentResponseDto ToDto(this Student student)
         {
-            return new StudentResponseDto(student.Id, student.FullName, student.Email, student.Level);
+            return new StudentResponseDto(student.Id, student.FullName, student.User.Email, student.Level);
         }
-        public static Student ToEntity(this CreateStudentDto dto)
+        public static Student ToEntity(this CreateStudentDto dto, User user)
         {
             return new Student
             {
                 FullName = dto.FullName,
-                Email = dto.Email
+                User = user
             };
         }
     }

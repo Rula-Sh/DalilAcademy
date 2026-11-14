@@ -9,11 +9,14 @@ namespace DalilAcademy.Infra.Data.Configurations
         public void Configure(EntityTypeBuilder<Instructor> builder)
         {
             builder.HasKey(i => i.Id);
+
             builder.Property(i => i.FullName).IsRequired().HasMaxLength(200);
-            builder.HasMany(i => i.Courses)
-                .WithOne(c => c.Instructor)
-                .HasForeignKey(c => c.InstructorId)
-                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(s => s.UserId).IsUnique();
+            builder.HasOne(s => s.User)
+               .WithOne()
+               .HasForeignKey<Instructor>(s => s.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

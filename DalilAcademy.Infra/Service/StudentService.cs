@@ -41,8 +41,7 @@ namespace DalilAcademy.Infra.Service
         {
             await validator.ValidateAndThrowAsync(dto);
 
-            var student = dto.ToEntity();
-            student.User = dto.ToUserEntity(hashPass);
+            var student = dto.ToEntity(dto.ToUserEntity(hashPass));
             student.User.RequireUpdatingPassword = requireUpdatingPassword;
             var created = await studentRepository.CreateAsync(student);
 
@@ -53,7 +52,6 @@ namespace DalilAcademy.Infra.Service
             var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found"); ;
 
             student.FullName = input.FullName;
-            student.Email = input.Email;
 
             await studentRepository.UpdateAsync(student);
         }

@@ -12,7 +12,7 @@ namespace DalilAcademy.Infra.Repository
     {
         public async Task<List<StudentResponseDto>> GetAllAsync()
         {
-            return await db.Students.Select(s => new StudentResponseDto(s.Id, s.FullName, s.Email, s.Level)).ToListAsync();
+            return await db.Students.Select(s => new StudentResponseDto(s.Id, s.FullName, s.User.Email, s.Level)).ToListAsync();
         }
         public async Task<PageResult<StudentResponseDto>> GetPageAsync(int page, int pageSize)
         {
@@ -21,7 +21,7 @@ namespace DalilAcademy.Infra.Repository
                 .OrderBy(c => c.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(s => new StudentResponseDto(s.Id, s.FullName, s.Email, s.Level))
+                .Select(s => new StudentResponseDto(s.Id, s.FullName, s.User.Email, s.Level))
                 .ToListAsync();
             return new PageResult<StudentResponseDto>(items, page, pageSize, count);
         }

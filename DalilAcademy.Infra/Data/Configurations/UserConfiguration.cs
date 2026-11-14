@@ -9,8 +9,14 @@ namespace DalilAcademy.Infra.Data.Configurations
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasIndex(u => u.Email).IsUnique();
-            builder.Property(u => u.Email).HasMaxLength(256);
-            builder.Property(u => u.Role).HasMaxLength(20);
+
+            builder.Property(s => s.Email).IsRequired().HasMaxLength(256);
+
+            builder.Property(u => u.PasswordHash).IsRequired().HasMaxLength(256);
+
+            builder.Property(u => u.Role).HasMaxLength(20).HasDefaultValue(Roles.Student);
+
+            builder.Property(e => e.CreatedAt).HasDefaultValueSql("now()");
         }
     }
 }

@@ -31,7 +31,8 @@ namespace DalilAcademy.Infra.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int>("InstructorId")
                         .HasColumnType("integer");
@@ -97,7 +98,13 @@ namespace DalilAcademy.Infra.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Instructors");
                 });
@@ -110,11 +117,6 @@ namespace DalilAcademy.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -123,13 +125,10 @@ namespace DalilAcademy.Infra.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -145,6 +144,11 @@ namespace DalilAcademy.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -152,15 +156,18 @@ namespace DalilAcademy.Infra.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<bool>("RequireUpdatingPassword")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Role")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Student");
 
                     b.HasKey("Id");
 
@@ -186,7 +193,7 @@ namespace DalilAcademy.Infra.Migrations
                     b.HasOne("DalilAcademy.Core.Entities.Course", "Course")
                         .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DalilAcademy.Core.Entities.Student", "Student")
@@ -200,12 +207,24 @@ namespace DalilAcademy.Infra.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("DalilAcademy.Core.Entities.Instructor", b =>
+                {
+                    b.HasOne("DalilAcademy.Core.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("DalilAcademy.Core.Entities.Instructor", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DalilAcademy.Core.Entities.Student", b =>
                 {
                     b.HasOne("DalilAcademy.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("DalilAcademy.Core.Entities.Student", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

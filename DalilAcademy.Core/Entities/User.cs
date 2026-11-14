@@ -7,6 +7,7 @@
         public string PasswordHash { get; set; } = string.Empty; // never the real password
         public string Role { get; set; } = Roles.Student; // set role to Student by def (best to set the role with the least privileges)
         public bool RequireUpdatingPassword { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
     public static class Roles

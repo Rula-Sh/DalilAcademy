@@ -13,8 +13,8 @@ namespace DalilAcademy.Core.Mappings
         {
             return new Enrollment()
             {
-                StudentId = dto.StudentId,
-                CourseId = dto.CourseId,
+                StudentId = dto.StudentId!.Value,
+                CourseId = dto.CourseId!.Value,
                 EnrolledAt = DateTime.UtcNow
             };
         }

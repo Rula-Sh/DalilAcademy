@@ -13,8 +13,8 @@ namespace DalilAcademy.Core.Validators
                 .EmailAddress().WithMessage("Email address must be valid");
 
             RuleFor(p => p.Password)
-                 .NotEmpty().WithMessage("Password field is required")
-                 .MaximumLength(100).WithMessage("Password cannot exceed 100 characters");
+                .NotEmpty().WithMessage("Password field is required")
+                .MaximumLength(100).WithMessage("Password cannot exceed 100 characters");
         }
     }
 }

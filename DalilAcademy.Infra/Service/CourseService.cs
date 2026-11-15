@@ -8,7 +8,12 @@ using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class CourseService(ICourseRepository courseRepository, IValidator<CreateCourseDto> validator, IImageService images) : ICourseService
+    public class CourseService(
+            ICourseRepository courseRepository,
+            IValidator<CreateCourseDto> createValidator,
+            IValidator<UpdateCourseDto> updateValidator,
+            IImageService images
+        ) : ICourseService
     {
         public Task<int> GetCountAsync()
         {
@@ -36,12 +41,15 @@ namespace DalilAcademy.Infra.Service
         }
         public async Task<CourseResponseDto?> GetByIdAsync(int id)
         {
+            if (id < 1)
+                throw new BadRequestException("Invalid Course ID");
+
             var course = await courseRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Course with ID {id} was not found");
             return course?.ToDto();
         }
         public async Task<CourseResponseDto> CreateAsync(CreateCourseDto dto)
         {
-            await validator.ValidateAndThrowAsync(dto); // validates the dto data, else throws a validation exception
+            await createValidator.ValidateAndThrowAsync(dto); // validates the dto data, else throws a validation exception
 
             var course = dto.ToEntity();
             var created = await courseRepository.CreateAsync(course);
@@ -50,15 +58,17 @@ namespace DalilAcademy.Infra.Service
         }
         public async Task UpdateAsync(int id, UpdateCourseDto input)
         {
+            await updateValidator.ValidateAndThrowAsync(input);
+
             var course = await courseRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Course with ID {id} was not found");
 
             course.Title = input.Title;
-            course.Price = input.Price;
+            course.Price = input.Price!.Value;
+            course.ImageUrl = input.ImageUrl;
 
-            var oldImage = course.ImageUrl;
-            course.Title = input.Title; course.Price = input.Price; course.ImageUrl = input.ImageUrl;
             await courseRepository.UpdateAsync(course);
 
+            var oldImage = course.ImageUrl;
             if (oldImage != input.ImageUrl)
                 images.DeleteCourseImage(oldImage);
         }

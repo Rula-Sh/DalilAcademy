@@ -8,14 +8,12 @@ namespace DalilAcademy.Core.Validators
         public CreateEnrollmentDtoValidator()
         {
             RuleFor(x => x.StudentId)
-                .GreaterThanOrEqualTo(1)
-                .NotEmpty()
-                .WithMessage("Student Id is invalid.");
+                .NotNull().WithMessage("Student ID is required")
+                .GreaterThan(0).WithMessage("Invalid Student ID");
 
             RuleFor(x => x.CourseId)
-                .GreaterThanOrEqualTo(1)
-                .NotEmpty()
-                .WithMessage("Student Id is invalid.");
+                .NotNull().WithMessage("Student ID is required")
+                .GreaterThan(0).WithMessage("Invalid Course ID");
         }
     }
 }

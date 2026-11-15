@@ -15,12 +15,14 @@ namespace DalilAcademy.API.Controllers
     {
         [HttpGet]
         [Route("all")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<List<EnrollmentResponseDto>>> GetAll()
         {
             return Ok(await enrollmentService.GetAllAsync());
         }
 
         [HttpGet]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<PageResult<EnrollmentResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             page = Math.Max(page, 1);
@@ -36,7 +38,7 @@ namespace DalilAcademy.API.Controllers
 
             string? token = await HttpContext.GetTokenAsync("access_token");
 
-            int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+            int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!);
 
             if (userId is 0 || token is null)
                 new UnauthorizedException("You are not logged in.");
@@ -48,6 +50,7 @@ namespace DalilAcademy.API.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<EnrollmentResponseDto>> GetById(int id)
         {
             var enrollment = await enrollmentService.GetByIdAsync(id);
@@ -58,10 +61,11 @@ namespace DalilAcademy.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{Roles.Student},{Roles.Admin}")]
         public async Task<ActionResult<EnrollmentResponseDto>> Enroll(CreateEnrollmentDto dto)
         {
-            var created = await enrollmentService.EnrollAsync(dto.StudentId, dto.CourseId);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id}, created);            
+            var created = await enrollmentService.EnrollAsync(dto.StudentId!.Value, dto.CourseId!.Value);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
     }
 }

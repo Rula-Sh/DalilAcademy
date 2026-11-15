@@ -8,7 +8,12 @@ using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class StudentService(IStudentRepository studentRepository, IValidator<CreateStudentDto> validator) : IStudentService
+    public class StudentService(
+            IStudentRepository studentRepository,
+            IUserRepository userRepository,
+            IValidator<CreateStudentDto> CreateValidator,
+            IValidator<UpdateStudentDto> UpdateValidator
+        ) : IStudentService
     {
         public Task<List<StudentResponseDto>> GetAllAsync()
         {
@@ -18,12 +23,19 @@ namespace DalilAcademy.Infra.Service
         {
             return studentRepository.GetPageAsync(page, pageSize);
         }
-        public Task<PageResult<CourseResponseDto>> GetCoursesInPageAsync(int id, int page, int pageSize)
+        public async Task<PageResult<CourseResponseDto>> GetCoursesInPageAsync(int id, int page, int pageSize)
         {
-            return studentRepository.GetCoursesInPageAsync(id, page, pageSize);
+            if (id < 1)
+                throw new BadRequestException("Invalid Student ID");
+            var student = await GetByIdAsync(id);
+
+            return await studentRepository.GetCoursesInPageAsync(id, page, pageSize);
         }
         public async Task<StudentResponseDto?> GetByIdAsync(int id)
         {
+            if (id < 1)
+                throw new BadRequestException("Invalid Student ID");
+
             var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found");
             return student?.ToDto();
         }
@@ -39,7 +51,7 @@ namespace DalilAcademy.Infra.Service
         }
         private async Task<Student> CreateStudentUserCoreAsync(CreateStudentDto dto, string hashPass, bool requireUpdatingPassword)
         {
-            await validator.ValidateAndThrowAsync(dto);
+            await CreateValidator.ValidateAndThrowAsync(dto);
 
             var student = dto.ToEntity(dto.ToUserEntity(hashPass));
             student.User.RequireUpdatingPassword = requireUpdatingPassword;
@@ -49,9 +61,15 @@ namespace DalilAcademy.Infra.Service
         }
         public async Task UpdateAsync(int id, UpdateStudentDto input)
         {
-            var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found"); ;
+            await UpdateValidator.ValidateAndThrowAsync(input);
+
+            var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found");
+            var user = await userRepository.GetByEmailAsync(input.Email);
+            if (user is not null && user.Email != input.Email)
+                throw new ConflictException($"A student with this email already exists.");
 
             student.FullName = input.FullName;
+            student.User.Email = input.Email;
 
             await studentRepository.UpdateAsync(student);
         }

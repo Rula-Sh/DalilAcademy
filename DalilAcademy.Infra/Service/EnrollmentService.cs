@@ -7,7 +7,12 @@ using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class EnrollmentService(IStudentRepository students, ICourseRepository courses, IEnrollmentRepository enrollments, IValidator<CreateEnrollmentDto> validator) : IEnrollmentService
+    public class EnrollmentService(
+            IStudentRepository students,
+            ICourseRepository courses,
+            IEnrollmentRepository enrollments,
+            IValidator<CreateEnrollmentDto> validator
+        ) : IEnrollmentService
     {
         public Task<List<EnrollmentResponseDto>> GetAllAsync()
         {
@@ -30,6 +35,9 @@ namespace DalilAcademy.Infra.Service
 
         public async Task<EnrollmentResponseDto?> GetByIdAsync(int id)
         {
+            if (id < 1)
+                throw new BadRequestException("Invalid Enrollement ID");
+
             var enrollment = await enrollments.GetByIdAsync(id) ?? throw new NotFoundException($"Enrollment with ID {id} was not found");
             return enrollment?.ToDto();
         }

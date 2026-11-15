@@ -1,5 +1,6 @@
 ﻿using DalilAcademy.Core.DTOs;
 using DalilAcademy.Core.Entities;
+
 namespace DalilAcademy.Core.Mappings
 {
     public static class CourseMappings
@@ -13,8 +14,8 @@ namespace DalilAcademy.Core.Mappings
             return new Course()
             {
                 Title = dto.Title,
-                Price = dto.Price,
-                InstructorId = dto.InstructorId,
+                Price = dto.Price!.Value,
+                InstructorId = dto.InstructorId!.Value,
                 ImageUrl = dto.ImageUrl
             };
         }

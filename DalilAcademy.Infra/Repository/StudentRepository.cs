@@ -39,7 +39,7 @@ namespace DalilAcademy.Infra.Repository
         }
         public async Task<Student?> GetByIdAsync(int id)
         {
-            return await db.Students.FindAsync(id);
+            return await db.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == id);
         }
         public async Task<Student?> GetByUserIdAsync(int id)
         {

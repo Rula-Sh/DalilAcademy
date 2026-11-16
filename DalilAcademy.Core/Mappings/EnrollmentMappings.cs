@@ -18,5 +18,14 @@ namespace DalilAcademy.Core.Mappings
                 EnrolledAt = DateTime.UtcNow
             };
         }
+        public static Enrollment ToEntity(this UpdateEnrollmentDto dto)
+        {
+            return new Enrollment()
+            {
+                StudentId = dto.StudentId!.Value,
+                CourseId = dto.CourseId!.Value,
+                EnrolledAt = DateTime.UtcNow
+            };
+        }
     }
 }

@@ -64,8 +64,26 @@ namespace DalilAcademy.API.Controllers
         [Authorize(Roles = $"{Roles.Student},{Roles.Admin}")]
         public async Task<ActionResult<EnrollmentResponseDto>> Enroll(CreateEnrollmentDto dto)
         {
-            var created = await enrollmentService.EnrollAsync(dto.StudentId!.Value, dto.CourseId!.Value);
+            var created = await enrollmentService.EnrollAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+
+        [HttpPut]
+        [Route("{id:int}")]
+        [Authorize(Roles = $"{Roles.Student},{Roles.Admin}")]
+        public async Task<ActionResult<EnrollmentResponseDto>> Change(int id, UpdateEnrollmentDto dto)
+        {
+            await enrollmentService.ChangeAsync(id, dto);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("{id:int}/cancel")]
+        [Authorize]
+        public async Task<ActionResult> Cancel(int id)
+        {
+            await enrollmentService.DeleteAsync(id);
+            return NoContent();
         }
     }
 }

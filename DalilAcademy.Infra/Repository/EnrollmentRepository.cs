@@ -27,7 +27,7 @@ namespace DalilAcademy.Infra.Repository
         }
         public async Task<PageResult<StudentEnrollmentsResponseDto>> GetStudentEnrollmentsAsync(int studentId, int page, int pageSize)
         {
-            var count= await db.Enrollments.Where(e=> e.StudentId == studentId).CountAsync();
+            var count = await db.Enrollments.Where(e => e.StudentId == studentId).CountAsync();
             var items = await db.Enrollments
                 .OrderBy(c => c.Id)
                 .Skip((page - 1) * pageSize)
@@ -41,7 +41,10 @@ namespace DalilAcademy.Infra.Repository
         {
             return await db.Enrollments.Include(e => e.Student).Include(e => e.Course).FirstOrDefaultAsync(e => e.Id == id);
         }
-
+        public async Task<Enrollment?> GetByStudentAndCourseAsync(int studentId, int courseId)
+        {
+            return await db.Enrollments.FirstOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId);
+        }
         public async Task<Enrollment> EnrollAsync(Enrollment enrollment)
         {
             try
@@ -59,6 +62,29 @@ namespace DalilAcademy.Infra.Repository
             {
                 throw new ConflictException("The student is already enrolled to this course.");
             }
+        }
+        public async Task ChangeAsync(Enrollment enrollment)
+        {
+            try
+            {
+                db.Enrollments.Update(enrollment);
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+            {
+                throw new ArgumentException("The student is already enrolled to this course.");
+            }
+        }
+        public async Task<bool> CancelAsync(int id)
+        {
+            var enrollment = await db.Enrollments.FindAsync(id);
+            if (enrollment is null)
+                return false;
+
+            db.Enrollments.Remove(enrollment);
+            await db.SaveChangesAsync();
+            return true;
         }
     }
 }

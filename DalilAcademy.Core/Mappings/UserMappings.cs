@@ -26,5 +26,22 @@ namespace DalilAcademy.Core.Mappings
                 RequireUpdatingPassword = dto.User.RequireUpdatingPassword
             };
         }
+        public static User ToUserEntity(this CreateInstructorDto dto, string passwordHash)
+        {
+            return new User
+            {
+                Email = dto.Email,
+                PasswordHash = passwordHash
+            };
+        }
+        public static User ToUserEntity(this Instructor dto)
+        {
+            return new User
+            {
+                Email = dto.User.Email,
+                PasswordHash = dto.User!.PasswordHash,
+                RequireUpdatingPassword = dto.User.RequireUpdatingPassword
+            };
+        }
     }
 }

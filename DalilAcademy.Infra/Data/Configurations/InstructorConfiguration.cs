@@ -12,10 +12,10 @@ namespace DalilAcademy.Infra.Data.Configurations
 
             builder.Property(i => i.FullName).IsRequired().HasMaxLength(200);
 
-            builder.HasIndex(s => s.UserId).IsUnique();
-            builder.HasOne(s => s.User)
+            builder.HasIndex(i => i.UserId).IsUnique();
+            builder.HasOne(i => i.User)
                .WithOne()
-               .HasForeignKey<Instructor>(s => s.UserId)
+               .HasForeignKey<Instructor>(i => i.UserId)
                .OnDelete(DeleteBehavior.Cascade);
         }
     }

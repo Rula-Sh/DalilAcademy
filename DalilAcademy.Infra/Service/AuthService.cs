@@ -7,7 +7,14 @@ using FluentValidation;
 
 namespace DalilAcademy.Infra.Service
 {
-    public class AuthService(IUserRepository users, IPasswordHasher hasher, ITokenService tokens, IStudentService studentService, IValidator<UpdatePasswordDto> updatePassValidator, IValidator<LoginRequestDto> loginValidator) : IAuthService
+    public class AuthService(IUserRepository users,
+            IPasswordHasher hasher,
+            ITokenService tokens,
+            IStudentService studentService,
+            IInstructorService instructorService,
+            IValidator<UpdatePasswordDto> updatePassValidator,
+            IValidator<LoginRequestDto> loginValidator
+        ) : IAuthService
     {
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto dto)
         {
@@ -18,7 +25,7 @@ namespace DalilAcademy.Infra.Service
             if (user is null || !hasher.Verify(dto.Password, user.PasswordHash))
                 throw new UnauthorizedException("Invalid email or password.");
 
-            if(!user.RequireUpdatingPassword)
+            if (!user.RequireUpdatingPassword)
                 throw new ForbiddenException("You must update your password before logging in.");
 
             var (token, expiresAt) = tokens.CreateToken(user);
@@ -37,6 +44,12 @@ namespace DalilAcademy.Infra.Service
 
             var (token, expiresAt) = tokens.CreateToken(user);
             return new LoginResponseDto(token, expiresAt);
+        }
+        public async Task<InstructorResponseDto> RegisterInstructorByAdminAsync(CreateInstructorDto dto)
+        {
+            var hash = hasher.Hash(dto.Password);
+            var created = await instructorService.CreateAsync(dto, hash);
+            return created;
         }
         public async Task<LoginResponseDto> UpdatePasswordAsync(UpdatePasswordDto dto)
         {

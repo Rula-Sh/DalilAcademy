@@ -21,6 +21,8 @@ namespace DalilAcademy.API.Middleware
                 ConflictException => (409, "Conflict"),
                 UnauthorizedException => (401, "Unauthorized"),
                 ForbiddenException => (403, "Forbidden"),
+                ServiceUnavailableException => (503, "Service Unavailable"),
+                PaymentFailedException => (400, "Bad request"),
                 HttpRequestException => (502, "External service unavailable"),
                 _ => (500, "An unexpected error occurred")
             };
@@ -32,7 +34,9 @@ namespace DalilAcademy.API.Middleware
                 Status = status,
                 Title = title,
                 Detail = exception is NotFoundException or BadRequestException or 
-                    InvalidFileException or ConflictException or UnauthorizedException or ForbiddenException or HttpRequestException 
+                    InvalidFileException or ConflictException or UnauthorizedException 
+                    or ForbiddenException or ServiceUnavailableException or PaymentFailedException 
+                    or HttpRequestException 
                     ? exception.Message : null
             };
             if (exception is ValidationException ve)

@@ -12,6 +12,7 @@ namespace DalilAcademy.Infra.Data
         public DbSet<Instructor> Instructors => Set<Instructor>();
         public DbSet<Enrollment> Enrollments => Set<Enrollment>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<Payment> Payments => Set<Payment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

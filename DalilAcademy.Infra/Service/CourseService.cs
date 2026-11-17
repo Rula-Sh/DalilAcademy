@@ -31,6 +31,12 @@ namespace DalilAcademy.Infra.Service
         {
             return courseRepository.GetAllWithEnrollmentsAsync();
         }
+        public async Task<List<StudentResponseDto>> GetPaidStudentsAsync(int id)
+        {
+            await GetByIdAsync(id);
+
+            return await courseRepository.GetPaidStudentsAsync(id);
+        }
         public Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize)
         {
             return courseRepository.GetPageAsync(page, pageSize);

@@ -12,27 +12,30 @@ namespace DalilAcademy.Infra.Repository
     {
         public async Task<List<EnrollmentResponseDto>> GetAllAsync()
         {
-            return await db.Enrollments.Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledAt)).ToListAsync();
+            return await db.Enrollments.Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledAt, e.Status.ToString())).ToListAsync();
         }
         public async Task<PageResult<EnrollmentResponseDto>> GetPageAsync(int page, int pageSize)
         {
             var count = await db.Enrollments.CountAsync();
             var items = await db.Enrollments
-                .OrderBy(c => c.Id)
+                .OrderBy(e => e.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledAt))
+                .Select(e => new EnrollmentResponseDto(e.Id, e.Student!.FullName, e.Course!.Title, e.EnrolledAt, e.Status.ToString()))
                 .ToListAsync();
             return new PageResult<EnrollmentResponseDto>(items, page, pageSize, count);
         }
         public async Task<PageResult<StudentEnrollmentsResponseDto>> GetStudentEnrollmentsAsync(int studentId, int page, int pageSize)
         {
-            var count = await db.Enrollments.Where(e => e.StudentId == studentId).CountAsync();
-            var items = await db.Enrollments
-                .OrderBy(c => c.Id)
+            var query = db.Enrollments
+                .AsNoTracking()
+                .Where(e => e.StudentId == studentId && e.Status == EnrollmentStatus.Paid);
+
+            var count = await query.CountAsync();
+            var items = await query
+                .OrderBy(e => e.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Where(e => e.StudentId == studentId)
                 .Select(e => new StudentEnrollmentsResponseDto(e.Course!.Title, e.EnrolledAt))
                 .ToListAsync();
             return new PageResult<StudentEnrollmentsResponseDto>(items, page, pageSize, count);
@@ -73,7 +76,7 @@ namespace DalilAcademy.Infra.Repository
             catch (DbUpdateException ex)
             when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
-                throw new ArgumentException("The student is already enrolled to this course.");
+                throw new ConflictException("The student is already enrolled to this course.");
             }
         }
         public async Task<bool> CancelAsync(int id)

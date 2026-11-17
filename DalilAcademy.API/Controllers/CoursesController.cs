@@ -40,6 +40,14 @@ namespace DalilAcademy.API.Controllers
         }
 
         [HttpGet]
+        [Route("{id:int}/students")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Instructor}")]
+        public async Task<ActionResult<List<StudentResponseDto>>> GetPaidStudents(int id)
+        {
+            return Ok(await courseService.GetPaidStudentsAsync(id));
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<PageResult<CourseResponseDto>>> GetAllByPage([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {

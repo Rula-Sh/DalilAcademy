@@ -11,7 +11,7 @@ namespace DalilAcademy.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class EnrollmentsController(IEnrollmentService enrollmentService) : ControllerBase
+    public class EnrollmentsController(IEnrollmentService enrollmentService, IPaymentService paymentService) : ControllerBase
     {
         [HttpGet]
         [Route("all")]
@@ -41,7 +41,7 @@ namespace DalilAcademy.API.Controllers
             int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!);
 
             if (userId is 0 || token is null)
-                new UnauthorizedException("You are not logged in.");
+                throw new UnauthorizedException("You are not logged in.");
 
             page = Math.Max(page, 1);
             pageSize = Math.Clamp(pageSize, 1, 50);
@@ -70,7 +70,7 @@ namespace DalilAcademy.API.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
-        [Authorize(Roles = $"{Roles.Student},{Roles.Admin}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<EnrollmentResponseDto>> Change(int id, UpdateEnrollmentDto dto)
         {
             await enrollmentService.ChangeAsync(id, dto);
@@ -84,6 +84,22 @@ namespace DalilAcademy.API.Controllers
         {
             await enrollmentService.DeleteAsync(id);
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("{id:int}/pay")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult> Pay(int id)
+        {
+            return Ok(await paymentService.PayAsync(id));
+        }
+
+        [HttpPost]
+        [Route("{id:int}/capture")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult> Capture(int id)
+        {
+            return Ok(await paymentService.CaptureAsync(id));
         }
     }
 }

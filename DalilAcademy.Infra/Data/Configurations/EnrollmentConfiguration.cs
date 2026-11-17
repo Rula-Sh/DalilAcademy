@@ -10,7 +10,7 @@ namespace DalilAcademy.Infra.Data.Configurations
         {
             builder.HasKey(e => e.Id);
 
-            builder.HasIndex(e => new { e.StudentId , e.CourseId}).IsUnique();
+            builder.HasIndex(e => new { e.StudentId, e.CourseId }).IsUnique();
 
             builder.HasOne(e => e.Course)
                 .WithMany(c => c.Enrollments)
@@ -23,6 +23,11 @@ namespace DalilAcademy.Infra.Data.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(e => e.EnrolledAt).HasDefaultValueSql("now()");
+
+            builder.Property(e => e.Status)
+                .HasConversion<string>() // added because by default, EF stores an enum as int
+                .HasMaxLength(20)
+                .HasDefaultValue(EnrollmentStatus.Pending);
         }
     }
 }

@@ -26,10 +26,7 @@ namespace DalilAcademy.Infra.Service
         }
         public async Task<PageResult<StudentEnrollmentsResponseDto>> GetStudentEnrollmentsAsync(int userId, int page, int pageSize)
         {
-            var student = await students.GetByUserIdAsync(userId);
-
-            if (student is null)
-                throw new NotFoundException($"Student with UserId {userId} was not found.");
+            var student = await students.GetByUserIdAsync(userId) ?? throw new NotFoundException($"Student with UserId {userId} was not found.");
 
             return await enrollments.GetStudentEnrollmentsAsync(student!.Id, page, pageSize);
         }
@@ -41,30 +38,23 @@ namespace DalilAcademy.Infra.Service
             var enrollment = await enrollments.GetByIdAsync(id) ?? throw new NotFoundException($"Enrollment with ID {id} was not found");
             return enrollment?.ToDto();
         }
-        public async Task<Enrollment?> GetByStudentAndCourseAsync(int studentId, int courseId)
-        {
-            if (await students.GetByIdAsync(studentId) is null)
-                throw new NotFoundException("Student not found.");
-
-            if (await courses.GetByIdAsync(courseId) is null)
-                throw new NotFoundException("Course not found.");
-
-            return await enrollments.GetByStudentAndCourseAsync(studentId, courseId) ?? throw new ConflictException($"The student is not enrolled to this course");
-        }
         public async Task<EnrollmentResponseDto> EnrollAsync(CreateEnrollmentDto dto)
         {
+
             if (await students.GetByIdAsync(dto.StudentId!.Value) is null)
                 throw new NotFoundException("Student not found.");
 
-            var course = await courses.GetByIdAsync(dto.CourseId!.Value);
-            if (course is null)
+            if (await courses.GetByIdAsync(dto.CourseId!.Value) is null)
                 throw new NotFoundException("Course not found.");
 
-            var dto = new CreateEnrollmentDto(studentId, courseId);
+            var course = await courses.GetByIdAsync(dto.CourseId!.Value);
 
             await createValidator.ValidateAndThrowAsync(dto);
 
             var enrollment = dto.ToEntity();
+            if (course!.Price == 0)
+                enrollment.Status = EnrollmentStatus.Paid;
+
             var created = await enrollments.EnrollAsync(enrollment); // unique index: already enrolled → 409
 
             return created.ToDto();
@@ -74,7 +64,12 @@ namespace DalilAcademy.Infra.Service
             await updateValidator.ValidateAndThrowAsync(input);
 
             var enrollment = await enrollments.GetByIdAsync(id);
+            var course = await courses.GetByIdAsync((int)input.CourseId!);
 
+            if (enrollment!.Status == EnrollmentStatus.Paid)
+                throw new ConflictException($"Cannot changed enrollment after payment");
+
+            if (course!.Price == 0) enrollment!.Status = EnrollmentStatus.Paid;
             enrollment.CourseId = input.CourseId!.Value;
             enrollment.StudentId = input.StudentId!.Value;
 
@@ -82,9 +77,10 @@ namespace DalilAcademy.Infra.Service
         }
         public async Task DeleteAsync(int id)
         {
-            await cancelValidator.ValidateAndThrowAsync(dto);
-
             var enrollment = await enrollments.GetByIdAsync(id);
+
+            if (enrollment!.Status == EnrollmentStatus.Paid)
+                throw new ConflictException($"Cannot cancel enrollment after payment");
 
             await enrollments.CancelAsync(enrollment!.Id);
         }

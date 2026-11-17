@@ -38,6 +38,14 @@ namespace DalilAcademy.Infra.Repository
             return await db.Courses.AsNoTracking().Select(c => new CourseWithEnrollmentsDto(c.Id, c.Title, c.Instructor!.FullName,
                c.Enrollments.Select(e => new CourseEnrollmentSummaryDto(e.StudentId, e.Student!.FullName, e.Student!.User.Email, e.EnrolledAt)).ToList())).ToListAsync();
         }
+        public async Task<List<StudentResponseDto>> GetPaidStudentsAsync(int id)
+        {
+            return await db.Enrollments
+                .AsNoTracking()
+                .Where(e=> e.CourseId == id && e.Status == EnrollmentStatus.Paid)
+                .Select(e => new StudentResponseDto(e.Student!.Id, e.Student.FullName, e.Student.User.Email, e.Student.Level))
+                .ToListAsync();
+        }
         public async Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize)
         {
             var count = await db.Courses.CountAsync();
@@ -63,7 +71,7 @@ namespace DalilAcademy.Infra.Repository
         }
         public async Task<Course?> GetByIdAsync(int id)
         {
-            return await db.Courses.Include(c => c.Instructor).FirstOrDefaultAsync(c => c.Id == id);
+            return await db.Courses.Include(c => c.Instructor).Include(c => c.Enrollments).FirstOrDefaultAsync(c => c.Id == id);
         }
         public async Task<Course> CreateAsync(Course course)
         {

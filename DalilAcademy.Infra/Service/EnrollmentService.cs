@@ -38,6 +38,13 @@ namespace DalilAcademy.Infra.Service
             var enrollment = await enrollments.GetByIdAsync(id) ?? throw new NotFoundException($"Enrollment with ID {id} was not found");
             return enrollment?.ToDto();
         }
+        public async Task<List<PaymentResponseDto>> GetPaymentsAsync(int id)
+        {
+            if (id < 1)
+                throw new BadRequestException("Invalid Enrollement ID");
+
+            return await enrollments.GetPaymentsAsync(id);
+        }
         public async Task<EnrollmentResponseDto> EnrollAsync(CreateEnrollmentDto dto)
         {
 

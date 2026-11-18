@@ -9,6 +9,7 @@ namespace DalilAcademy.Core.Service
         Task<PageResult<EnrollmentResponseDto>> GetPageAsync(int page, int pageSize);
         Task<PageResult<StudentEnrollmentsResponseDto>> GetStudentEnrollmentsAsync(int userId, int page, int pageSize);
         Task<EnrollmentResponseDto?> GetByIdAsync(int id);
+        Task<List<PaymentResponseDto>> GetPaymentsAsync(int id);
         Task<EnrollmentResponseDto> EnrollAsync(CreateEnrollmentDto dto);
         Task ChangeAsync(int id,UpdateEnrollmentDto dto);
         Task DeleteAsync(int id);

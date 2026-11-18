@@ -44,6 +44,15 @@ namespace DalilAcademy.Infra.Repository
         {
             return await db.Enrollments.Include(e => e.Student).Include(e => e.Course).FirstOrDefaultAsync(e => e.Id == id);
         }
+        public async Task<List<PaymentResponseDto>> GetPaymentsAsync(int id)
+        {
+            return await db.Payments
+                .Where(p => p.EnrollmentId == id)
+                .OrderByDescending(p => p.PaidAt)
+                .Select(p => new PaymentResponseDto(p.Id, p.PayPalOrderId, p.Amount, p.Currency, p.Status.ToString(), p.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                    p.PaidAt != null ? p.PaidAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : "Didn't Pay"))
+                .ToListAsync();
+        }
         public async Task<int> GetEnrolledCountByCourseIdAsync(int id)
         {
             return await db.Enrollments.Where(e => e.Course!.Id == id && e.Status == EnrollmentStatus.Paid).CountAsync();

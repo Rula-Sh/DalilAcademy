@@ -101,5 +101,13 @@ namespace DalilAcademy.API.Controllers
         {
             return Ok(await paymentService.CaptureAsync(id));
         }
+
+        [HttpGet]
+        [Route("{id:int}/payments")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult<List<PaymentResponseDto>>> GetPayments(int id)
+        {
+            return Ok(await enrollmentService.GetPaymentsAsync(id));
+        }
     }
 }

@@ -7,15 +7,21 @@ namespace DalilAcademy.Core.Validators
     {
         public CreateCourseDtoValidator()
         {
+            RuleFor(x => x.Title)
+                .NotEmpty().WithMessage("Title is required")
+                .MaximumLength(200).WithMessage("Title cannot exceed 200 characters");
+
             RuleFor(x => x.Price)
                 //.Cascade(CascadeMode.Stop)
                 .NotNull().WithMessage("Price is required")
                 .GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative value")
                 .LessThanOrEqualTo(50000).WithMessage("Price is too high");
 
-            RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title is required")
-                .MaximumLength(200).WithMessage("Title cannot exceed 200 characters");
+            RuleFor(c => c.Capacity)
+                .NotNull().WithMessage("Capacity is required")
+                .GreaterThan(0).WithMessage("Capacity must be be a non-negative value")
+                .GreaterThanOrEqualTo(15).WithMessage("Capacity must be 15 or more")
+                .LessThanOrEqualTo(1000).WithMessage("Capacity is too high");
 
             RuleFor(x => x.InstructorId)
                 .NotNull().WithMessage("Instructor ID is required")

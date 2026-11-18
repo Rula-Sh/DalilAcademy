@@ -74,6 +74,12 @@ namespace DalilAcademy.Infra.Service
                 await paymentRepo.UpdateAsync(latestCreatedPayment);
                 throw new PaymentFailedException("the createdPayment session has ended, call /pay again.");
             }
+            if (enrollment.Course!.Capacity <= await enrollments.GetEnrolledCountByCourseIdAsync(enrollment.Course!.Id))
+            {
+                latestCreatedPayment.Status = PaymentStatus.Failed;
+                await paymentRepo.UpdateAsync(latestCreatedPayment);
+                throw new PaymentFailedException("This course reached its max capacity.");
+            }
 
             bool captured;
             try

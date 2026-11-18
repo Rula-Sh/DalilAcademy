@@ -51,6 +51,9 @@ namespace DalilAcademy.Infra.Service
 
             await createValidator.ValidateAndThrowAsync(dto);
 
+            if (course!.Capacity <= await enrollments.GetEnrolledCountByCourseIdAsync(course.Id))
+                throw new ConflictException("This course reached its maximum capacity.");
+
             var enrollment = dto.ToEntity();
             if (course!.Price == 0)
                 enrollment.Status = EnrollmentStatus.Paid;
@@ -68,6 +71,9 @@ namespace DalilAcademy.Infra.Service
 
             if (enrollment!.Status == EnrollmentStatus.Paid)
                 throw new ConflictException($"Cannot changed enrollment after payment");
+
+            if (course!.Capacity <= await enrollments.GetEnrolledCountByCourseIdAsync(course.Id))
+                throw new ConflictException("This course reached its max capacity.");
 
             if (course!.Price == 0) enrollment!.Status = EnrollmentStatus.Paid;
             enrollment.CourseId = input.CourseId!.Value;

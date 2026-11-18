@@ -17,6 +17,9 @@ namespace DalilAcademy.Infra.Data.Configurations
 
             builder.Property(c => c.Price).HasPrecision(10, 2);
 
+            builder.Property(c => c.Capacity).HasDefaultValue(15);
+            builder.ToTable(e => e.HasCheckConstraint("CK_Capacity_Range", "\"Capacity\" >= 15 AND \"Capacity\" <= 9999"));
+
             builder.HasOne(c => c.Instructor)
                 .WithMany(i => i.Courses)
                 .HasForeignKey(c => c.InstructorId)

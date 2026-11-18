@@ -30,6 +30,11 @@ namespace DalilAcademy.Infra.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Capacity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(15);
+
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -53,7 +58,10 @@ namespace DalilAcademy.Infra.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", t =>
+                        {
+                            t.HasCheckConstraint("CK_Capacity_Range", "\"Capacity\" >= 15 AND \"Capacity\" <= 9999");
+                        });
                 });
 
             modelBuilder.Entity("DalilAcademy.Core.Entities.Enrollment", b =>

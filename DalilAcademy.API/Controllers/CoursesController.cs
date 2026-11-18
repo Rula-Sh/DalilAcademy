@@ -71,6 +71,15 @@ namespace DalilAcademy.API.Controllers
             return Ok(await courseService.GetByPricePageAsync(min, max, page, pageSize));
         }
 
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PageResult<CourseResponseDto>>> GetBySearch([FromQuery] string search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+            return Ok(await courseService.GetBySearchAsync(search, page, pageSize));
+        }
+
         [HttpGet]
         [Route("{id:int}")]
         [AllowAnonymous]

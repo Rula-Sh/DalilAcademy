@@ -44,6 +44,10 @@ namespace DalilAcademy.Infra.Repository
         {
             return await db.Enrollments.Include(e => e.Student).Include(e => e.Course).FirstOrDefaultAsync(e => e.Id == id);
         }
+        public async Task<int> GetEnrolledCountByCourseIdAsync(int id)
+        {
+            return await db.Enrollments.Where(e => e.Course!.Id == id && e.Status == EnrollmentStatus.Paid).CountAsync();
+        }
         public async Task<Enrollment?> GetByStudentAndCourseAsync(int studentId, int courseId)
         {
             return await db.Enrollments.FirstOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId);

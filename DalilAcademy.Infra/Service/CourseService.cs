@@ -45,6 +45,10 @@ namespace DalilAcademy.Infra.Service
         {
             return courseRepository.GetByPricePageAsync(min, max, page, pageSize);
         }
+        public async Task<PageResult<CourseResponseDto>> GetBySearchAsync(string search, int page, int pageSize)
+        {
+            return await courseRepository.GetBySearchAsync(search, page, pageSize);
+        }
         public async Task<CourseResponseDto?> GetByIdAsync(int id)
         {
             if (id < 1)

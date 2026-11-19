@@ -12,6 +12,7 @@ namespace DalilAcademy.Infra.Service
             ICourseRepository courseRepository,
             IValidator<CreateCourseDto> createValidator,
             IValidator<UpdateCourseDto> updateValidator,
+            IValidator<PriceFilterQueryDto> filterValidator,
             IImageService images
         ) : ICourseService
     {
@@ -41,9 +42,11 @@ namespace DalilAcademy.Infra.Service
         {
             return courseRepository.GetPageAsync(page, pageSize);
         }
-        public Task<PageResult<CourseResponseDto>> GetByPricePageAsync(int min, int max, int page, int pageSize)
+        public async Task<PageResult<CourseResponseDto>> GetByPricePageAsync(PriceFilterQueryDto query, int page, int pageSize)
         {
-            return courseRepository.GetByPricePageAsync(min, max, page, pageSize);
+            await filterValidator.ValidateAndThrowAsync(query);
+
+            return await courseRepository.GetByPricePageAsync(query, page, pageSize);
         }
         public async Task<PageResult<CourseResponseDto>> GetBySearchAsync(string search, int page, int pageSize)
         {

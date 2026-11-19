@@ -57,10 +57,11 @@ namespace DalilAcademy.Infra.Repository
                 .ToListAsync();
             return new PageResult<CourseResponseDto>(items, page, pageSize, count);
         }
-        public async Task<PageResult<CourseResponseDto>> GetByPricePageAsync(int min, int max, int page, int pageSize)
+        public async Task<PageResult<CourseResponseDto>> GetByPricePageAsync(PriceFilterQueryDto query, int page, int pageSize)
         {
             var count = await db.Courses.CountAsync();
             var items = await db.Courses
+                .Where(c => c.Price >= query.Min && c.Price <= query.Max)
                 .OrderBy(c => c.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

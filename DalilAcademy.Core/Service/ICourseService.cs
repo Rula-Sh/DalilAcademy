@@ -9,7 +9,7 @@ namespace DalilAcademy.Core.Service
         Task<List<CourseWithEnrollmentsDto>> GetAllWithEnrollmentsAsync();
         Task<List<StudentResponseDto>> GetPaidStudentsAsync(int id);
         Task<PageResult<CourseResponseDto>> GetPageAsync(int page, int pageSize);
-        Task<PageResult<CourseResponseDto>> GetByPricePageAsync(int min, int max, int page, int pageSize);
+        Task<PageResult<CourseResponseDto>> GetByPricePageAsync(PriceFilterQueryDto query, int page, int pageSize);
         Task<PageResult<CourseResponseDto>> GetBySearchAsync(string search, int page, int pageSize);
         Task<CourseResponseDto?> GetByIdAsync(int id);
         Task<CourseResponseDto> CreateAsync(CreateCourseDto course);

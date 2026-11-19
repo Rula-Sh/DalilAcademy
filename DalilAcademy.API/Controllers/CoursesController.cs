@@ -56,19 +56,31 @@ namespace DalilAcademy.API.Controllers
             return Ok(await courseService.GetPageAsync(page, pageSize));
         }
 
-        [HttpGet]
-        [Route("filter-by-price")]
-        [AllowAnonymous]
-        public async Task<ActionResult<PageResult<CourseResponseDto>>> FilterByPricePage([FromQuery] int min = 0, [FromQuery] int max = 9999, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-        {
-            if (max < min)
-                throw new BadRequestException("Cannot set the max price value less than the min.");
+        //[HttpGet]
+        //[Route("filter-by-price")]
+        //[AllowAnonymous]
+        //public async Task<ActionResult<PageResult<CourseResponseDto>>> FilterByPricePage([FromQuery] int min = 0, [FromQuery] int max = 9999, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        //{
+        //    if (max < min)
+        //        throw new BadRequestException("Cannot set the max price value less than the min.");
 
-            min = Math.Max(min, 0);
-            max = Math.Min(max, 9999);
+        //    if (min <= 0 || max < 0 || page < 0 || pageSize < 0)
+        //        throw new BadRequestException("Invalid input: min/max must be non-negative and page/pageSize must be at least 1.");
+
+        //    min = Math.Max(min, 0);
+        //    max = Math.Min(max, 9999);
+        //    page = Math.Max(page, 1);
+        //    pageSize = Math.Clamp(pageSize, 1, 50);
+        //    return Ok(await courseService.GetByPricePageAsync(min, max, page, pageSize));
+        //}
+
+        [HttpGet("filter-by-price")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PageResult<CourseResponseDto>>> FilterByPricePage([FromQuery] PriceFilterQueryDto query, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
             page = Math.Max(page, 1);
             pageSize = Math.Clamp(pageSize, 1, 50);
-            return Ok(await courseService.GetByPricePageAsync(min, max, page, pageSize));
+            return Ok(await courseService.GetByPricePageAsync(query, page, pageSize));
         }
 
         [HttpGet("search")]

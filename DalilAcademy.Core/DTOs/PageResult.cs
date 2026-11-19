@@ -4,4 +4,5 @@
     {
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
     }
+    public record PriceFilterQueryDto(int Min = 0, int Max = 9999);
 }

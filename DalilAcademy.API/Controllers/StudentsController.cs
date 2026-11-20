@@ -28,7 +28,8 @@ namespace DalilAcademy.API.Controllers
 
         [HttpGet]
         [Route("{id:int}/courses")]
-        public async Task<ActionResult<PageResult<CourseResponseDto>>> GetCoursesInPage(int id,[FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Student}")]
+        public async Task<ActionResult<PageResult<CourseResponseDto>>> GetCoursesInPage(int id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             page = Math.Max(page, 1);
             pageSize = Math.Clamp(pageSize, 1, 50);

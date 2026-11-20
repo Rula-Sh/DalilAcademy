@@ -27,13 +27,15 @@ namespace DalilAcademy.Infra.Repository
         }
         public async Task<PageResult<CourseResponseDto>> GetCoursesInPageAsync(int id, int page, int pageSize)
         {
-            var count = await db.Students.CountAsync();
+            var count = await db.Enrollments
+                .Where(e => e.StudentId == id && e.Status == EnrollmentStatus.Paid)
+                .CountAsync();
             var items = await db.Enrollments
+                .Where(e => e.StudentId == id && e.Status == EnrollmentStatus.Paid)
                 .OrderBy(e => e.CourseId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Where(e => e.StudentId == id)
-                .Select(e => new CourseResponseDto(e.Course!.Id, e.Course.Title, e.Course.Price, e.Course.Instructor!.FullName, e.Course.ImageUrl))
+                .Select(e => new CourseResponseDto(e.Course!.Id, e.Course.Title, e.Course.Price, e.Course.Capacity, e.Course.Instructor!.FullName, e.Course.ImageUrl))
                 .ToListAsync();
             return new PageResult<CourseResponseDto>(items, page, pageSize, count);
         }
@@ -58,7 +60,7 @@ namespace DalilAcademy.Infra.Repository
             catch (DbUpdateException ex)
             when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
-                throw new ConflictException("A student with this email already exists.");
+                throw new ConflictException("A user with this email already exists.");
             }
         }
         public async Task UpdateAsync(Student student)
@@ -71,7 +73,7 @@ namespace DalilAcademy.Infra.Repository
             catch (DbUpdateException ex)
             when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
-                throw new ConflictException("A student with this email already exists.");
+                throw new ConflictException("A user with this email already exists.");
             }
         }
         public async Task<bool> DeleteAsync(int id)

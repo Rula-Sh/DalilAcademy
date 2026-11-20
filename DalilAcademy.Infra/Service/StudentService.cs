@@ -27,7 +27,7 @@ namespace DalilAcademy.Infra.Service
         {
             if (id < 1)
                 throw new BadRequestException("Invalid Student ID");
-            var student = await GetByIdAsync(id);
+            await GetByIdAsync(id);
 
             return await studentRepository.GetCoursesInPageAsync(id, page, pageSize);
         }
@@ -66,7 +66,7 @@ namespace DalilAcademy.Infra.Service
             var student = await studentRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Student with ID {id} was not found");
             var user = await userRepository.GetByEmailAsync(input.Email);
             if (user is not null && user.Email != input.Email)
-                throw new ConflictException($"A student with this email already exists.");
+                throw new ConflictException($"A user with this email already exists.");
 
             student.FullName = input.FullName;
             student.User.Email = input.Email;
